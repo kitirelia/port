@@ -12,15 +12,17 @@ class Welcome extends CI_Controller {
 	{
 		//$this->load->view('welcome_message');
 		if(!$this->session->userdata('logged')){
-			echo "revision 3";
-			echo "Git3 revision two Not login";
+			//echo "revision 32";
+			//echo "Git3 revision two Not login";
 			//$this->show_login();
+			$this->go_loginpage();
 		}else{
 			echo "Git3 revision two Redirect to feed";
 			//$this->new_feed();
 		}
 	}
+	public function go_loginpage(){
+		$this->load->view("view_user_login");
+	}
 }
 
-/* End of file welcome.php */
-/* Location: ./application/controllers/welcome.php */
