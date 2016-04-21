@@ -41,7 +41,7 @@
 			</div>
 		</div>
 		<div>
-			<a href="<?php echo site_url() ?>/user_activity/regis_member" class="rig">Register</a>
+			<a href="<?php echo site_url() ?>/user_activity/go_page_regis_member" class="rig">Register</a>
 		</div>
 	</div>
 
