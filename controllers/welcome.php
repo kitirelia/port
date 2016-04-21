@@ -12,10 +12,10 @@ class Welcome extends CI_Controller {
 	{
 		//$this->load->view('welcome_message');
 		if(!$this->session->userdata('logged')){
-			echo "Not login";
+			echo "Git3 revision two Not login";
 			//$this->show_login();
 		}else{
-			echo "Redirect to feed";
+			echo "Git3 revision two Redirect to feed";
 			//$this->new_feed();
 		}
 	}
