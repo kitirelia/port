@@ -17,7 +17,7 @@ class User_activity extends CI_Controller{
       
 
         if($this->F->run()==TRUE){
-        	echo "Regis success<br>";
+        	//echo "Regis success<br>";
         	$time = time();
         	$data = array(
 				'email' => $this->input->post('email'),
@@ -28,13 +28,14 @@ class User_activity extends CI_Controller{
 				'register_date' =>$time
 			);
         	$data["res"]=$this->db_model->register_user($data);
-        	echo "<br>result: ";
+        	//echo "<br>result: ";
         	//print_r($data["res"]);
-        	echo json_encode( $data["res"] );
-			//register_user
-        	//$this->load->view('view_user_register');
+        	//echo json_encode( $data["res"] );
+        	//print_r($data);
+        	$this->load->view('view_user_register_result',$data["res"]);
         }else{
-        	echo "Register fail!";
+        	//echo "Register fail!";
+        	$this->load->view('view_user_register');
         }
 	}
 	

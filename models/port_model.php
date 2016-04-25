@@ -6,17 +6,18 @@
 			$this->load->database("port_db",TRUE);
 		}
 		function register_user($data){
-			echo "<br>in model <br>";
-			print_r($data);
+			//print_r($data);
 			$query=$this->db->insert('user_data',$data);
-			echo "query is ".$query;
+			//echo "query is ".$query;
 			if(!$query){
 				$errNo   = $this->db->_error_number();
    				$errMess = $this->db->_error_message();
    				$data=array(
    					'stat'=>'0',
    					'error_no'=>$errNo ,
-   					'error_msg'=>$errMess
+   					'error_msg'=>$errMess,
+   					'alldone'=>FALSE,
+   					'uid'=>-1
    					);
    				//echo "<br>Error ".$errMess;
    				return $data;
@@ -27,7 +28,8 @@
    					'stat'=>$this->db->affected_rows(),
    					'error_no'=>'-1',
    					'error_msg'=>'-1',
-   					'alldone'=>TRUE
+   					'alldone'=>TRUE,
+   					'uid'=>$uid 
    					);
 				//$this->_insert_user_detail($uid,$arr['user_name']);
 				//echo "<br>Success";
