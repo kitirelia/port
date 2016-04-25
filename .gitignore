@@ -1,0 +1,11 @@
+#no keep folder
+cache/
+config/
+core/
+errors/
+helpers/
+hooks/
+language/
+libraries/
+logs/
+third_party/
