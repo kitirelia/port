@@ -9,6 +9,38 @@ class User_activity extends CI_Controller{
 		$this->load->library('form_validation',NULL,'F');
 	}
 
+	public function user_login(){
+		
+		 $this->F->set_rules('email', 'HeyEmail', 'trim|valid_email|required');
+		 $this->F->set_rules('password', 'Hey debug', 'trim|required');
+		if($this->F->run()==TRUE){
+			//echo "checking..";
+			$data=array(
+				'email'=>$this->input->post('email'),
+				'password'=>$this->input->post('password')
+				);
+			$data=$this->db_model->check_account_exist($data);
+			//print_r($data['res']);
+			if($data['stat']>0){
+				//echo "Found user";
+				$data['logged']=TRUE;
+				$this->session->set_userdata($data);
+				$this->load->view('view_gen_head');
+				$this->load->view('view_login_form_result',$data);
+				$this->load->view("view_logout");
+				$this->load->view('view_gen_footer');
+			}else{
+				$data['logged']=FALSE;
+				$this->load->view('view_gen_head');
+				$this->load->view('view_login_form',$data);
+				$this->load->view('view_gen_footer');
+				//echo "Some thing went wrong";
+			}
+		}else{
+			echo "Wrong rulese";
+		}
+	}
+
 	public function regis_member(){
        $this->F->set_rules('email', 'HeyEmail', 'trim|valid_email|required');
        $this->F->set_rules('username', 'Hey debug', 'trim|required');
@@ -37,6 +69,10 @@ class User_activity extends CI_Controller{
         	//echo "Register fail!";
         	$this->load->view('view_user_register');
         }
+	}
+	public function logout(){
+		$this->session->sess_destroy();
+		redirect('/welcome'.'/?logout=aenxwe');
 	}
 	
 	public function go_page_regis_member(){

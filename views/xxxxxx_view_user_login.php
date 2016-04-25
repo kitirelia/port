@@ -25,7 +25,7 @@
 				<div class="panel-body form_deco">
 					<h3 class='h3text'>Login</h3>
 					<div class='force_center'>
-					<form name='form1' method="post" action="<?php echo site_url() ?>index.php/user_search/check_member" >
+					<form name='form1' method="post" action="<?php echo site_url() ?>/user_search/check_member" >
 						<div class="form-group">
 							<input type ="text" placeholder='USERNAME' size=30 name='user_name'>
 						</div>
