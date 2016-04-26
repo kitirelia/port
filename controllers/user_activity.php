@@ -81,14 +81,93 @@ class User_activity extends CI_Controller{
 		$this->load->view('view_user_register');
 	}
 
-	public function do_upload(){
-		$config['upload_path'] = './uploads/origin/';
+	public function upload_image(){
+		$config['upload_path'] = './uploads/fullsize/';
 		$config['allowed_types'] = 'jpg|png';
-		$config['max_size']	= '1024000';
+		$config['max_size']	= '1024*10';
 		$config['file_name'] = time()."_".$this->_random_string(10);
 		$this->load->library('upload', $config);
+
+		if(!$this->upload->do_upload()){
+			$data = array('error'=>$this->upload->display_erros());
+			print_r($data);
+		}else{
+			echo "allow upload<br/>";
+			$data = array(
+				'upload_data' => $this->upload->data(),
+				'email' => $this->input->post('email'),
+				'uid' => $this->input->post('uid'),
+				'caption' => $this->input->post('caption')
+			);
+			$data['image_name']=$data['upload_data']['file_name'];
+
+			//------------- make thumb
+			$new_widht=($data['upload_data']['image_width'])*(320/$data['upload_data']['image_height']);
+			$config1 = array(
+		      'source_image' => $data['upload_data']['full_path'], //get original image
+		      'new_image' => './uploads/thumb/', //save as new image //need to create thumbs first
+		      'maintain_ratio' => true,
+		      'height' => 320,
+		      'width' => $new_widht
+		    );
+		     $this->load->library('image_lib', $config1); //load library
+    		 $this->image_lib->resize(); //generating thumb
+    		 if (!$this->image_lib->resize()) {
+		        echo $this->image_lib->display_errors();
+		    }
+		    // clear //
+		    $this->image_lib->clear();
+		    //echo "thumb success";
+			//-------- add general conten------
+			if($data['upload_data']['is_image']==1){
+				$mime_type="image";
+			}else{
+				$mime_type="video";
+			}
+			//echo "mime is ".$mime_type;
+		    $addData = array(
+		    	'user_id'=>$data['uid'],
+		    	'caption'=>$data['caption'],
+		    	'file_name'=>$data['image_name'],
+		    	'mime_type'=>$mime_type,
+		    	'create_date'=>time()
+		    );
+		    //print_r($addData);
+			$content_id = $this->db_model->addSingle_content($addData);
+			echo "Success content id ".$content_id['uid'].'<br/>';
+			//echo "----------- check hashtag ---------------<br/>";
+			//echo $data['caption']."<br/>";
+			$hash_arr= $this->_clean_for_hashtag($data['caption']);
+			
+			if(count($hash_arr)>0){
+				//echo "req # id";
+				$hash_tag_id_arr = array();
+				foreach ($hash_arr as $each_hash) {
+					//echo "fet id ".$content_id['uid']."  #".$each_hash."<br/>";
+					$_raw_hash_id=$this->db_model->check_hashtag_id($each_hash);
+					array_push($hash_tag_id_arr,array(
+						'hash_id'=>$_raw_hash_id,
+						'content_id'=>$content_id['uid']
+						)
+					);
+					$data = array(
+						'content_post_id'=>$content_id['uid'],
+						'hashtag_id'=>$_raw_hash_id
+						);
+					$update_content_detail=$this->db_model->pair_content_and_hashtag($data);
+				}
+			}else{
+				echo "pass #check step";
+			}
+			//print_r($hash_arr);
+			echo "<br>-----------ALL DONE-----------------";
+		}//end else do_upload
 		
 	}// end do_upload()
+
+
+
+	//------------------------ helper function 
 	function _random_string($length) {
 	    $key = '';
 	    $keys = array_merge(range(0, 9), range('a', 'z'));
@@ -97,4 +176,28 @@ class User_activity extends CI_Controller{
 	    }
 	    return $key;
 	}//end _random_string()
+	function _clean_for_hashtag($raw){
+		$hash_raw = array();
+		$arr0=explode(' ', $raw);
+		foreach ($arr0 as $data) {
+			if($data!== '' && $data[0]=='#'){
+				$data = substr($data,1);	
+				$pos = strpos($data, '#');
+				if($pos>0){
+					$inside_clean=explode('#',$data);
+					foreach ($inside_clean as $inside_data) {
+						if($inside_data!==''){
+							array_push($hash_raw,$inside_data);
+						}
+					}
+				}else{
+					//echo "push ".$data.'</br>';
+					array_push($hash_raw,$data);
+				}
+			}else{
+				//echo "wrog data ".$data."|".($data[0])."</br>";
+			}
+		}
+		return $hash_raw;
+	}
 }
