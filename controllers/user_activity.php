@@ -88,9 +88,24 @@ class User_activity extends CI_Controller{
 		$config['file_name'] = time()."_".$this->_random_string(10);
 		$this->load->library('upload', $config);
 
-		if(!$this->upload->do_upload()){
-			$data = array('error'=>$this->upload->display_erros());
-			print_r($data);
+		///echo "time debug ".$this->input->post('debug_time');
+		$user_timer = $this->input->post('debug_time');
+		//echo "incoming time ".strlen($user_timer);
+		if(strlen($user_timer)>0){
+			echo "FLASH TIME|".$user_timer."|";
+		}
+		else{
+			$user_timer=time();
+			echo "server time";
+		}
+		// echo "jpg file ".$this->input->post('email').'<br/>';
+		// echo "mail ".$this->input->post('email').'<br/>';
+		// echo "uid  ".$this->input->post('uid').'<br/>';
+		// echo "caption  ".$this->input->post('caption').'<br/>';
+		echo "-------------------";
+		if(! $this->upload->do_upload()){
+			$error = array('error' => $this->upload->display_errors());
+			print_r($error);
 		}else{
 			echo "allow upload<br/>";
 			$data = array(
@@ -130,7 +145,7 @@ class User_activity extends CI_Controller{
 		    	'caption'=>$data['caption'],
 		    	'file_name'=>$data['image_name'],
 		    	'mime_type'=>$mime_type,
-		    	'create_date'=>time()
+		    	'create_date'=>$user_timer
 		    );
 		    //print_r($addData);
 			$content_id = $this->db_model->addSingle_content($addData);
