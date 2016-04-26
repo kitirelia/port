@@ -22,14 +22,15 @@ class User_activity extends CI_Controller{
 			$data=$this->db_model->check_account_exist($data);
 			//print_r($data['res']);
 			if($data['stat']>0){
-				//echo "Found user";
 				$data['logged']=TRUE;
 				$this->session->set_userdata($data);
 				$this->load->view('view_gen_head');
-				$this->load->view('view_login_form_result',$data);
+				$this->load->view('view_form_upload');
+				$this->load->view('view_new_feed',$data);
 				$this->load->view("view_logout");
 				$this->load->view('view_gen_footer');
 			}else{
+				echo "not found";
 				$data['logged']=FALSE;
 				$this->load->view('view_gen_head');
 				$this->load->view('view_login_form',$data);

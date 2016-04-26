@@ -17,11 +17,12 @@ class Welcome extends CI_Controller {
 			//$this->show_login();
 			$this->go_loginpage();
 		}else{
-			echo "Git3 revision two Redirect to feed";
-			$this->load->view("view_gen_head");
+			echo "have sessioni redirect";
+			$this->load->view('view_gen_head');
+			$this->load->view('view_form_upload');
+			$this->load->view('view_new_feed');
 			$this->load->view("view_logout");
-			$this->load->view("view_gen_footer");
-			
+			$this->load->view('view_gen_footer');
 		}
 	}
 	public function go_loginpage(){
