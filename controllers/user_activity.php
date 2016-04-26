@@ -7,6 +7,7 @@ class User_activity extends CI_Controller{
 		$this->load->model("Port_model","db_model");
 		$this->load->helper(array('html','file','form','url'));
 		$this->load->library('form_validation',NULL,'F');
+
 	}
 
 	public function user_login(){
@@ -79,4 +80,21 @@ class User_activity extends CI_Controller{
 	public function go_page_regis_member(){
 		$this->load->view('view_user_register');
 	}
+
+	public function do_upload(){
+		$config['upload_path'] = './uploads/origin/';
+		$config['allowed_types'] = 'jpg|png';
+		$config['max_size']	= '1024000';
+		$config['file_name'] = time()."_".$this->_random_string(10);
+		$this->load->library('upload', $config);
+		
+	}// end do_upload()
+	function _random_string($length) {
+	    $key = '';
+	    $keys = array_merge(range(0, 9), range('a', 'z'));
+	    for ($i = 0; $i < $length; $i++) {
+	        $key .= $keys[array_rand($keys)];
+	    }
+	    return $key;
+	}//end _random_string()
 }

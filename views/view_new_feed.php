@@ -1,5 +1,5 @@
 <script type="text/javascript">
-	document.title = "This is the new page title.";
+	document.title = "New Feed";
 </script>
 <div class='container'>
 		<div class='row'>
