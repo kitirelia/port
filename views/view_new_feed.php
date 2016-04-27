@@ -10,7 +10,7 @@
 						echo '<div class="panel panel-default">';
 						echo '	<div class="panel-body">';
 						//echo '	<div> <img src=../../uploads/thumb/'.$data['file_name'].' class="img-circle" height="42" width="42"> </div>';
-						echo ' 		<a href="'.base_url()."index.php/user_search/serch_username/".$data['user_id'].'"><p class="lead">'.$data['user_id'].'</p><a>';
+						echo ' 		<a href="'.base_url()."index.php/user_search/serch_username/".$data['user_id'].'"><p class="lead">'.$data['user_name'].'</p><a>';
 						echo '		<div class="thumbnail">';
 						//echo image_asset('logo.png');
 						echo '			<img src="'.base_url().'/uploads/thumb/'.$data['file_name'].'" class="img-responsive">';
