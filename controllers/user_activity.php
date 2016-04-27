@@ -25,9 +25,17 @@ class User_activity extends CI_Controller{
 			if($data['stat']>0){
 				$data['logged']=TRUE;
 				$this->session->set_userdata($data);
+				$feed_data = $this->db_model->fetch_new_feed($data['uid']);
+				//echo "control";
+				//print_r($feed_data);
+				$data_pack= array(
+					'user_data'=>$data,
+					'content_data'=>$feed_data
+					);
+
 				$this->load->view('view_gen_head');
 				$this->load->view('view_form_upload');
-				$this->load->view('view_new_feed',$data);
+				$this->load->view('view_new_feed',$data_pack);
 				$this->load->view("view_logout");
 				$this->load->view('view_gen_footer');
 			}else{
@@ -62,10 +70,6 @@ class User_activity extends CI_Controller{
 				'register_date' =>$time
 			);
         	$data["res"]=$this->db_model->register_user($data);
-        	//echo "<br>result: ";
-        	//print_r($data["res"]);
-        	//echo json_encode( $data["res"] );
-        	//print_r($data);
         	$this->load->view('view_user_register_result',$data["res"]);
         }else{
         	//echo "Register fail!";
@@ -98,10 +102,6 @@ class User_activity extends CI_Controller{
 			$user_timer=time();
 			echo "server time";
 		}
-		// echo "jpg file ".$this->input->post('email').'<br/>';
-		// echo "mail ".$this->input->post('email').'<br/>';
-		// echo "uid  ".$this->input->post('uid').'<br/>';
-		// echo "caption  ".$this->input->post('caption').'<br/>';
 		echo "-------------------";
 		if(! $this->upload->do_upload()){
 			$error = array('error' => $this->upload->display_errors());
@@ -202,11 +202,13 @@ class User_activity extends CI_Controller{
 					$inside_clean=explode('#',$data);
 					foreach ($inside_clean as $inside_data) {
 						if($inside_data!==''){
+							$inside_data = clean_spacial_character($inside_data);
 							array_push($hash_raw,$inside_data);
 						}
 					}
 				}else{
 					//echo "push ".$data.'</br>';
+					$data = clean_spacial_character($data);
 					array_push($hash_raw,$data);
 				}
 			}else{
@@ -214,5 +216,10 @@ class User_activity extends CI_Controller{
 			}
 		}
 		return $hash_raw;
-	}
+	}//end _clean_for_hashtag
+	function clean_spacial_character($string) {
+	   $string = str_replace(' ', '', $string); // Replaces all spaces with hyphens.
+	   $string = preg_replace('~[\r\n]+~', '', $string);
+	   return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+	}//end clean_spacial_character
 }

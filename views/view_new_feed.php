@@ -6,7 +6,7 @@
 			<?php
 				if($this->session->userdata('stat')>=1){//Success
 					echo "<p>Success</p>";
-					echo "<p>usename ".$this->session->userdata('user_name')."</p>";
+					echo "<p>Hello ".$this->session->userdata('user_name')."</p>";
 					echo "<p>email ".$this->session->userdata('email')."</p>";
 					echo "<p>image ".$this->session->userdata('profile_picture')."</p>";
 				}else{
@@ -14,4 +14,4 @@
 				}
 			?>
 		<div> <!-- end class row -->
-	</div>
+</div>

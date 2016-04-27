@@ -6,6 +6,27 @@
 			$this->load->database("port_db",TRUE);
 		}
 
+		function fetch_new_feed($req_id){
+			echo "request new feed from ".$req_id."<br>";
+			$select_list=array('user_id','caption','file_name','create_date');
+
+			$all_record = $this->db->count_all('content_data');
+			// echo "all record ".$all_record."<br>";
+			// echo "then start from ".($all_record-10)." end ".$all_record."<br>";
+			$query=$this->db->select($select_list)
+			->order_by('create_date','ASC')
+			->limit(10)
+			->get('content_data');
+			$result=$query->result_array();
+			return $result;
+			// echo "result <br>";
+			// echo "first is ".$result[0]['create_date'];
+			// echo "<br>";
+			//print_r($result);
+			//echo json_encode($result);
+			echo "<br>---------------------";
+		}
+
 		function check_account_exist($arr){
 			$query = $this->db->where('email',$arr['email'])
 			->where('password',$arr['password'])
