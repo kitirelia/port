@@ -28,7 +28,7 @@ class User_activity extends CI_Controller{
 				$feed_data = $this->db_model->fetch_new_feed($data['uid']);
 				//echo "control";
 				//print_r($feed_data);
-				$data_pack= array(
+				$data_pack['result']= array(
 					'user_data'=>$data,
 					'content_data'=>$feed_data
 					);
