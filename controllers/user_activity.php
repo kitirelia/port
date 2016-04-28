@@ -90,6 +90,29 @@ class User_activity extends CI_Controller{
 		$this->load->view('view_user_register');
 	}
 
+	//###### show content each user
+	public function show_content_user($uid){
+		//echo "seach of ".$uid;
+		$data['user_content']=$this->db_model->fetch_personal_content($uid);
+		$data_pack['result']= array(
+					'user_data'=>array(),
+					'content_data'=>$data['user_content']
+					);
+		$this->load->view('view_gen_head');
+					$this->load->view('view_form_upload');
+					$this->load->view('view_new_feed',$data_pack);
+					$this->load->view("view_logout");
+					$this->load->view('view_gen_footer');
+	}
+
+//--------------- ## hashtag search ----
+	public function show_content_by_hashtag($hashtag){
+		//echo "#".$hashtag;
+		$data['hash_result'] = $this->db_model->fetch_hashtag_content($hashtag);
+	}
+
+
+	//############ upload ##########
 	public function upload_image(){
 		$config['upload_path'] = './uploads/fullsize/';
 		$config['allowed_types'] = 'jpg|png';
@@ -238,7 +261,8 @@ class User_activity extends CI_Controller{
 	function clean_spacial_character($string) {
 	   $string = str_replace(' ', '', $string); // Replaces all spaces with hyphens.
 	   $string = preg_replace('~[\r\n]+~', '', $string);
-	   return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+	  // return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+	    return $string;
 	}//end clean_spacial_character
 	function _add_link_hashtag($raw_str){
 		$raw_arr = explode(' ', $raw_str);

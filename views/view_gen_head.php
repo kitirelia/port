@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
 <head>
+	<meta charset="UFT-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Hello</title>
 	<?php echo js_asset('jquery-1.12.0.min.js'); ?>
 	<?php echo css_asset('bootstrap.min.css'); ?>
