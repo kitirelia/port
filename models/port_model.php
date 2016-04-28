@@ -57,16 +57,31 @@
 				->join('content_data','hashtag_content.content_post_id = content_data.post_id','INNER')
 				->where('hashtag_content.hashtag_id',$hash_id)
 				->get('hashtag_content');
-				$result=$query->result_array();
-				print_r($result);
-				echo "<br>";
-				foreach ($result as $t ) {
-					# code...
-					echo "cap ".$t['caption']; 
-					echo "<br>";
+				$pair_data=$query->result_array();
+				//print_r($pair_data);
+				echo count($pair_data)." users <br>";
+
+				for($i=0;$i<count($pair_data);$i++){
+					$sub_table_list = array(
+						'content_data.user_id','content_data.caption','content_data.file_name','content_data.create_date','content_data.post_id'
+						,'user_data.id','user_data.user_name','user_data.profile_picture','user_data.user_stat'
+						);
+					// //echo "uid ".$single_data['user_id']; 
+					$user_query=$this->db
+					->where('user_data.id',$pair_data[$i]['user_id'])
+					->get('user_data');
+					$user_and_conten_data = $user_query->result_array();
+					$pair_data[$i]['user_name']=$user_and_conten_data[0]['user_name'];
+					$pair_data[$i]['profile_picture']=$user_and_conten_data[0]['profile_picture'];
+					$pair_data[$i]['user_stat']=$user_and_conten_data[0]['user_stat'];
+					
+					//print_r($pair_data[$i]['caption']);
+					//echo "-----------------<br>";
 				}
+				return $pair_data;
+			
 			}else{
-				echo "No #";
+				return array();
 			}
 		}
 
