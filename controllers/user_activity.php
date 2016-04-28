@@ -26,18 +26,23 @@ class User_activity extends CI_Controller{
 				$data['logged']=TRUE;
 				$this->session->set_userdata($data);
 				$feed_data = $this->db_model->fetch_new_feed($data['uid']);
-				//echo "control";
-				//print_r($feed_data);
+				echo "is admin ".$data['user_stat']."<br>";
 				$data_pack['result']= array(
 					'user_data'=>$data,
 					'content_data'=>$feed_data
 					);
-
-				$this->load->view('view_gen_head');
-				$this->load->view('view_form_upload');
-				$this->load->view('view_new_feed',$data_pack);
-				$this->load->view("view_logout");
-				$this->load->view('view_gen_footer');
+				if($data['user_stat']!='admin'){
+					$this->load->view('view_gen_head');
+					$this->load->view('view_form_upload');
+					$this->load->view('view_new_feed',$data_pack);
+					$this->load->view("view_logout");
+					$this->load->view('view_gen_footer');
+				}else if($data['user_stat']==='admin'){
+					$this->load->view('view_gen_head');
+					$this->load->view('view_admin_feed',$data_pack);
+					$this->load->view("view_logout");
+					$this->load->view('view_gen_footer');
+				}
 			}else{
 				echo "not found";
 				$data['logged']=FALSE;
@@ -151,14 +156,15 @@ class User_activity extends CI_Controller{
 			$content_id = $this->db_model->addSingle_content($addData);
 			echo "Success content id ".$content_id['uid'].'<br/>';
 			//echo "----------- check hashtag ---------------<br/>";
-			//echo $data['caption']."<br/>";
+			//echo 'caption '.$data['caption']."<br/>";
 			$hash_arr= $this->_clean_for_hashtag($data['caption']);
-			
+			print_r($hash_arr);
 			if(count($hash_arr)>0){
 				//echo "req # id";
 				$hash_tag_id_arr = array();
 				foreach ($hash_arr as $each_hash) {
 					//echo "fet id ".$content_id['uid']."  #".$each_hash."<br/>";
+					//echo "#to insert ".$each_hash;
 					$_raw_hash_id=$this->db_model->check_hashtag_id($each_hash);
 					array_push($hash_tag_id_arr,array(
 						'hash_id'=>$_raw_hash_id,
@@ -172,14 +178,26 @@ class User_activity extends CI_Controller{
 					$update_content_detail=$this->db_model->pair_content_and_hashtag($data);
 				}
 			}else{
-				echo "pass #check step";
+				//echo "pass #check step";
 			}
 			//print_r($hash_arr);
-			echo "<br>-----------ALL DONE-----------------";
+			//echo "<br>-----------ALL DONE-----------------";
 		}//end else do_upload
 		
 	}// end do_upload()
 
+
+
+	//--------------------- DELETE POST----------
+
+	function delete_post($to_del_id){
+		//echo "to delete post id ".$to_del_id;
+		$data['result']=$this->db_model->delete_post_content($to_del_id);
+		//echo "<br>---- del result-------<br>";
+		//print_r($data['result']);
+		redirect(base_url(), 'refresh');
+
+	}
 
 
 	//------------------------ helper function 
@@ -208,7 +226,7 @@ class User_activity extends CI_Controller{
 					}
 				}else{
 					//echo "push ".$data.'</br>';
-					$data = clean_spacial_character($data);
+					$data = $this->clean_spacial_character($data);
 					array_push($hash_raw,$data);
 				}
 			}else{
@@ -222,4 +240,18 @@ class User_activity extends CI_Controller{
 	   $string = preg_replace('~[\r\n]+~', '', $string);
 	   return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
 	}//end clean_spacial_character
+	function _add_link_hashtag($raw_str){
+		$raw_arr = explode(' ', $raw_str);
+		$clean_data ="";
+		foreach ($raw_arr as $data) {
+			$pos = strpos( $data, '#');
+			if($pos !== false){
+				echo $pos." ->".$data."<br>";
+				$data='<a href ="http://www.google.com/'.$data.'">'.$data.'</a>';
+			}
+			$clean_data.=" ".$data;
+		}
+		 return $clean_data;
+		//return 'hello';
+	}//end _add_link_hashtag
 }

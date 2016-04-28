@@ -1,6 +1,9 @@
 <script type="text/javascript">
-	document.title = "New Feed";
+	document.title = "ADMIN FEED";
 </script>
+<style type="text/css">
+
+</style>
 <?php
 	function _add_link_hashtag($raw_str){
 		$raw_arr = explode(' ', $raw_str);
@@ -27,22 +30,19 @@
 						echo '	<div class="panel-body">';
 						//echo '	<div> <img src=../../uploads/thumb/'.$data['file_name'].' class="img-circle" height="42" width="42"> </div>';
 						echo ' 		<a href="'.base_url()."index.php/user_search/serch_username/".$data['user_id'].'"><p class="lead">'.$data['user_name'].'</p></a>';
+						echo "<p>post id ".$data['post_id']."</p>";
+						echo '<a href="'.base_url().'index.php/user_activity/delete_post/'.$data['post_id'].'" class="btn btn-danger" role="button">DELETE</a>';
 						echo '		<div class="thumbnail">';
 						//echo image_asset('logo.png');
 						echo '			<img src="'.base_url().'/uploads/thumb/'.$data['file_name'].'" class="img-responsive">';
 						echo '		</div>';
 						echo '<p>';
-						// $raw = explode(',', $data['caption']);
-						// foreach ($raw as $data2) {
-						// 	if(trim($data2)!=""){
-						// 		echo " <a href='
-						// 		".base_url()."index.php/user_search/search_hashtag/".$data2."
-						// 		'>#".$data2."</a>";
-						// 	}
-						// }
 						$data['caption'] = _add_link_hashtag($data['caption']);
 							echo $data['caption'];
 						echo '</p>';
+						// echo '<div class="form-group">';
+						// echo '	<input type="submit" value="DELETE" class="btn btn-default" />';
+						// echo '</div>';
 						echo '	</div>';
 						echo "</div>";
 					}
