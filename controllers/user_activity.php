@@ -33,6 +33,7 @@ class User_activity extends CI_Controller{
 					);
 				if($data['user_stat']!='admin'){
 					$this->load->view('view_gen_head');
+					$this->load->view('view_nav_user_bar');
 					$this->load->view('view_form_upload');
 					$this->load->view('view_new_feed',$data_pack);
 					$this->load->view("view_logout");
@@ -99,10 +100,11 @@ class User_activity extends CI_Controller{
 					'content_data'=>$data['user_content']
 					);
 		$this->load->view('view_gen_head');
-					$this->load->view('view_form_upload');
-					$this->load->view('view_new_feed',$data_pack);
-					$this->load->view("view_logout");
-					$this->load->view('view_gen_footer');
+		$this->load->view('view_nav_user_bar');
+		$this->load->view('view_form_upload');
+		$this->load->view('view_new_feed',$data_pack);
+		$this->load->view("view_logout");
+		$this->load->view('view_gen_footer');
 	}
 
 //--------------- ## hashtag search ----
@@ -118,10 +120,11 @@ class User_activity extends CI_Controller{
 			'content_data'=>$data['hash_result']
 			);
 		$this->load->view('view_gen_head');
-					$this->load->view('view_form_upload');
-					$this->load->view('view_new_feed',$data_pack);
-					$this->load->view("view_logout");
-					$this->load->view('view_gen_footer');
+		$this->load->view('view_nav_user_bar');
+		$this->load->view('view_form_upload');
+		$this->load->view('view_new_feed',$data_pack);
+		$this->load->view("view_logout");
+		$this->load->view('view_gen_footer');
 	}
 
 
@@ -218,6 +221,8 @@ class User_activity extends CI_Controller{
 			}
 			//print_r($hash_arr);
 			//echo "<br>-----------ALL DONE-----------------";
+			redirect(base_url(), 'refresh');
+
 		}//end else do_upload
 		
 	}// end do_upload()

@@ -28,6 +28,7 @@ class Welcome extends CI_Controller {
 					);
 				if($data['user_stat']!='admin'){
 					$this->load->view('view_gen_head');
+					$this->load->view('view_nav_user_bar');
 					$this->load->view('view_form_upload');
 					$this->load->view('view_new_feed',$data_pack);
 					$this->load->view("view_logout");

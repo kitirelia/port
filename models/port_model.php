@@ -15,7 +15,7 @@
 			$query = $this->db->select($table_list)
 			->join('user_data','content_data.user_id=user_data.id','LEFT')
 			->order_by('content_data.create_date','DESC')
-			->limit(10)
+			->limit(20,1)
 			->get('content_data');
 			$result=$query->result_array();
 			return $result;
