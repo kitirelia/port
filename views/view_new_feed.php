@@ -21,6 +21,8 @@
 		<div id="display_view">
 			<div id="content" class = "col-md-6 col-md-offset-3">
 				<?php
+				print_r($this->session->userdata);
+				echo "<br>danm<br>";
 					foreach ($result['content_data'] as $data) {
 
 						echo '<div class="panel panel-default">';

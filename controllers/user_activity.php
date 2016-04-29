@@ -15,28 +15,28 @@ class User_activity extends CI_Controller{
 		 $this->F->set_rules('email', 'HeyEmail', 'trim|valid_email|required');
 		 $this->F->set_rules('password', 'Hey debug', 'trim|required');
 		if($this->F->run()==TRUE){
-			//echo "checking..";
 			$data=array(
 				'email'=>$this->input->post('email'),
 				'password'=>$this->input->post('password')
 				);
 			$data=$this->db_model->check_account_exist($data);
-			//print_r($data['res']);
 			if($data['stat']>0){
 				$data['logged']=TRUE;
 				$this->session->set_userdata($data);
 				$feed_data = $this->db_model->fetch_new_feed($data['uid']);
-				echo "is admin ".$data['user_stat']."<br>";
 				$data_pack['result']= array(
 					'user_data'=>$data,
 					'content_data'=>$feed_data
 					);
+				// echo "<br>when login<br>";
+				// print_r($this->session);
+				// echo "<br>afger login<br>";
 				if($data['user_stat']!='admin'){
+					$this->load->view("view_logout");
 					$this->load->view('view_gen_head');
 					$this->load->view('view_nav_user_bar');
 					$this->load->view('view_form_upload');
 					$this->load->view('view_new_feed',$data_pack);
-					$this->load->view("view_logout");
 					$this->load->view('view_gen_footer');
 				}else if($data['user_stat']==='admin'){
 					$this->load->view('view_gen_head');
@@ -76,7 +76,38 @@ class User_activity extends CI_Controller{
 				'register_date' =>$time
 			);
         	$data["res"]=$this->db_model->register_user($data);
-        	$this->load->view('view_user_register_result',$data["res"]);
+        	$data['logged']=TRUE;
+        	echo "uid is ".$data["res"]['uid']."<br>";
+        	
+        	//echo "<br>before exit";
+        	//exit();
+        	$some=$this->session->set_userdata($data);
+        		$feed_data = $this->db_model->fetch_new_feed($some['uid']);
+				 echo "is admin ".$some['uid']."<br>";
+				$data_pack['result']= array(
+					//'user_data'=>$data,
+					'user_data'=>$some,
+					'content_data'=>$feed_data
+					);
+				echo "<br>when register<br>";
+				print_r($some);
+				echo "<br>after register<br>";
+
+				//exit();
+				if($data['user_stat']!='admin'){
+					$this->load->view('view_gen_head');
+					$this->load->view("view_logout");
+					$this->load->view('view_nav_user_bar');
+					$this->load->view('view_form_upload');
+					$this->load->view('view_new_feed',$data_pack);
+					$this->load->view('view_gen_footer');
+				}else if($data['user_stat']==='admin'){
+					$this->load->view('view_gen_head');
+					$this->load->view('view_admin_feed',$data_pack);
+					$this->load->view("view_logout");
+					$this->load->view('view_gen_footer');
+				}
+        	//$this->load->view('view_user_register_result',$data["res"]);
         }else{
         	//echo "Register fail!";
         	$this->load->view('view_user_register');
@@ -202,8 +233,6 @@ class User_activity extends CI_Controller{
 				//echo "req # id";
 				$hash_tag_id_arr = array();
 				foreach ($hash_arr as $each_hash) {
-					//echo "fet id ".$content_id['uid']."  #".$each_hash."<br/>";
-					//echo "#to insert ".$each_hash;
 					$_raw_hash_id=$this->db_model->check_hashtag_id($each_hash);
 					array_push($hash_tag_id_arr,array(
 						'hash_id'=>$_raw_hash_id,
@@ -219,7 +248,6 @@ class User_activity extends CI_Controller{
 			}else{
 				//echo "pass #check step";
 			}
-			//print_r($hash_arr);
 			//echo "<br>-----------ALL DONE-----------------";
 			redirect(base_url(), 'refresh');
 
