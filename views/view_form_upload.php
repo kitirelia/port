@@ -3,8 +3,7 @@
 				<div class="col-md-6 col-md-offset-3 ">
 					<div class="panel-body form_deco">
 						<form action="<?php echo site_url() ?>/user_activity/upload_image" method="post" enctype="multipart/form-data">
-							<?php echo $this->session->userdata('user_name'); ?>
-							<?php echo 'id'. $this->session->userdata('uid'); ?>
+							
 							<div class="form-group">
 								<label >Select Image</label>
 								<input type="file" name="userfile" size="20" />

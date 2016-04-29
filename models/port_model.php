@@ -7,7 +7,7 @@
 		}
 
 		function fetch_new_feed($req_id){
-			echo "request new feed from ".$req_id."<br>";
+			//echo "request new feed from ".$req_id."<br>";
 			$table_list = array(
 				'content_data.user_id','content_data.caption','content_data.file_name','content_data.create_date','content_data.post_id'
 				,'user_data.id','user_data.user_name','user_data.profile_picture','user_data.user_stat'
@@ -48,7 +48,7 @@
 			$hash_res=$hash_id_query->result_array();
 			if(count($hash_res)>0){
 				$hash_id = $hash_res[0]['id'];
-				echo "# id is ".$hash_id.'<br>';
+				//echo "# id is ".$hash_id.'<br>';
 				$table_list = array(
 					'content_data.user_id','content_data.caption','content_data.file_name','content_data.create_date','content_data.post_id'
 					,'hashtag_content.content_post_id','hashtag_content.hashtag_id'
@@ -59,7 +59,7 @@
 				->get('hashtag_content');
 				$pair_data=$query->result_array();
 				//print_r($pair_data);
-				echo count($pair_data)." users <br>";
+				//echo count($pair_data)." users <br>";
 
 				for($i=0;$i<count($pair_data);$i++){
 					$sub_table_list = array(
@@ -200,7 +200,7 @@
 		}// end addSingle_content
 
 		function check_hashtag_id($income_hashtag){
-			echo "<br>income #".$income_hashtag."<br/>";
+			//echo "<br>income #".$income_hashtag."<br/>";
 			$query=$this->db->get_where('hashtag_stat',array('hashtag_name'=>$income_hashtag));
 			$req = $query->result_array();
 			if ( $query->num_rows() > 0 ){
@@ -218,7 +218,7 @@
 		function pair_content_and_hashtag($pair_data){
 			$query=$this->db->insert('hashtag_content',$pair_data);	
 			$hash_tag_id = $this->db->insert_id();
-			echo "<br>pair id ".$hash_tag_id." <br>";
+			//echo "<br>pair id ".$hash_tag_id." <br>";
 		}
 	}
 
