@@ -58,6 +58,8 @@ class User_activity extends CI_Controller{
 	}
 	public function flash_debug_upload(){
 		//echo "hello flash";
+		echo "debug++|".$this->input->post('debug_caption')."|++";
+
 		$config['upload_path'] = './uploads/fullsize/';
 		$config['allowed_types'] = 'jpg|png';
 		$config['max_size']	= '1024*10';
@@ -94,7 +96,7 @@ class User_activity extends CI_Controller{
 				'caption' => $this->input->post('caption')
 			);
 			$data['image_name']=$data['upload_data']['file_name'];
-			
+			echo "here|".$data['caption']."|";
 			// //------------- make thumb
 			$new_widht=($data['upload_data']['image_width'])*(320/$data['upload_data']['image_height']);
 			$config1 = array(
@@ -119,14 +121,16 @@ class User_activity extends CI_Controller{
 				$mime_type="video";
 			}
 			//echo "mime is ".$mime_type;
+
 		    $addData = array(
 		    	'user_id'=>$id_req,
+		    	//'caption'=>'ðŸ˜€',
 		    	'caption'=>$data['caption'],
 		    	'file_name'=>$data['image_name'],
 		    	'mime_type'=>$mime_type,
 		    	'create_date'=>$user_timer
 		    );
-		
+			$this->db_model->debug_emoji($addData['caption']);
 		 	$content_id = $this->db_model->addSingle_content($addData);
 		
 		 	$hash_arr= $this->_clean_for_hashtag($data['caption']);
@@ -415,7 +419,7 @@ class User_activity extends CI_Controller{
 					$inside_clean=explode('#',$data);
 					foreach ($inside_clean as $inside_data) {
 						if($inside_data!==''){
-							$inside_data = clean_spacial_character($inside_data);
+							$inside_data = $this->clean_spacial_character($inside_data);
 							array_push($hash_raw,$inside_data);
 						}
 					}

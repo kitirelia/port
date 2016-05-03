@@ -15,7 +15,7 @@
 			$query = $this->db->select($table_list)
 			->join('user_data','content_data.user_id=user_data.id','LEFT')
 			->order_by('content_data.create_date','DESC')
-			->limit(20,1)
+			->limit(300,1)
 			->get('content_data');
 			$result=$query->result_array();
 			return $result;
@@ -173,6 +173,7 @@
 		}//end register_user
 
 		function addSingle_content($data){
+			echo "before insert ".$data['caption'];
 			$query=$this->db->insert('content_data',$data);
 			if(!$query){
 				$errNo   = $this->db->_error_number();
@@ -248,6 +249,8 @@
 				//echo "!!register done ".$uid;
 			}
 		}
-
+		function debug_emoji($data){
+			$this->db->insert('emoji', array('emoji' => $data));
+		}
 	}
 ?>

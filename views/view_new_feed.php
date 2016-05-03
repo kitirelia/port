@@ -26,6 +26,8 @@
 		<div id="display_view">
 			<div id="content" class = "col-md-6 col-md-offset-3">
 				<?php
+				echo json_decode('"\uD83D\uDE00"');
+				echo "------------------------";
 					foreach ($result['content_data'] as $data) {
 
 						echo '<div class="panel panel-default">';
@@ -39,6 +41,8 @@
 						echo '<p>';
 						$data['caption'] = _add_link_hashtag($data['caption']);
 							echo $data['caption'];
+						//$emo = "\uD83D\uDE00";
+						//echo json_decode($emo);
 						echo '</p>';
 						echo '	</div>';
 						echo "</div>";
