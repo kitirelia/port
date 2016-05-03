@@ -1,5 +1,10 @@
 <script type="text/javascript">
 	document.title = "New Feed";
+	// $(window).scroll(function() {
+	//    if($(window).scrollTop() + $(window).height() == $(document).height()) {
+	//        alert("bottom!");
+	//    }
+	// });
 </script>
 <?php
 	function _add_link_hashtag($raw_str){

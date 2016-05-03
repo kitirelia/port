@@ -56,7 +56,105 @@ class User_activity extends CI_Controller{
 			echo "Wrong rulese";
 		}
 	}
+	public function flash_debug_upload(){
+		//echo "hello flash";
+		$config['upload_path'] = './uploads/fullsize/';
+		$config['allowed_types'] = 'jpg|png';
+		$config['max_size']	= '1024*10';
+		$config['file_name'] = time()."_".$this->_random_string(10);
+		$this->load->library('upload', $config);
 
+		///echo "time debug ".$this->input->post('debug_time');
+		$user_timer = $this->input->post('debug_time');
+		if(strlen($user_timer)>0){
+			//echo "FLASH TIME|".$user_timer."|";
+		}
+		else{
+			$user_timer=time();
+			//echo "server time";
+		}
+		$user_name=$this->input->post('user_name');
+		//echo "username is ".$user_name;
+
+		//------- check user_id
+		$id_req = $this->db_model->flash_req_id_by_user_name($user_name);
+		echo "   user id is ".$id_req;
+		//echo "-------------------";
+		
+		if(! $this->upload->do_upload()){
+			$error = array('error' => $this->upload->display_errors());
+			print_r($error);
+		}else{
+			echo "allow upload<br/>";
+
+			$data = array(
+				'upload_data' => $this->upload->data(),
+				'email' => 'justmail@mail.com',
+				'uid' => $id_req,
+				'caption' => $this->input->post('caption')
+			);
+			$data['image_name']=$data['upload_data']['file_name'];
+			
+			// //------------- make thumb
+			$new_widht=($data['upload_data']['image_width'])*(320/$data['upload_data']['image_height']);
+			$config1 = array(
+		      'source_image' => $data['upload_data']['full_path'], //get original image
+		      'new_image' => './uploads/thumb/', //save as new image //need to create thumbs first
+		      'maintain_ratio' => true,
+		      'height' => 320,
+		      'width' => $new_widht
+		    );
+		     $this->load->library('image_lib', $config1); //load library
+    		 $this->image_lib->resize(); //generating thumb
+    		 if (!$this->image_lib->resize()) {
+		        echo $this->image_lib->display_errors();
+		    }
+		   
+		    $this->image_lib->clear();
+		    echo "thumb success";
+			//-------- add general conten------
+			if($data['upload_data']['is_image']==1){
+				$mime_type="image";
+			}else{
+				$mime_type="video";
+			}
+			//echo "mime is ".$mime_type;
+		    $addData = array(
+		    	'user_id'=>$id_req,
+		    	'caption'=>$data['caption'],
+		    	'file_name'=>$data['image_name'],
+		    	'mime_type'=>$mime_type,
+		    	'create_date'=>$user_timer
+		    );
+		
+		 	$content_id = $this->db_model->addSingle_content($addData);
+		
+		 	$hash_arr= $this->_clean_for_hashtag($data['caption']);
+		
+			if(count($hash_arr)>0){
+				//echo "req # id";
+				$hash_tag_id_arr = array();
+				foreach ($hash_arr as $each_hash) {
+					$_raw_hash_id=$this->db_model->check_hashtag_id($each_hash);
+					array_push($hash_tag_id_arr,array(
+						'hash_id'=>$_raw_hash_id,
+						'content_id'=>$content_id['uid']
+						)
+					);
+					$data = array(
+						'content_post_id'=>$content_id['uid'],
+						'hashtag_id'=>$_raw_hash_id
+						);
+					$update_content_detail=$this->db_model->pair_content_and_hashtag($data);
+				}
+			}else{
+				//echo "pass #check step";
+			}
+			echo "<br>-----------ALL DONE-----------------";
+			//redirect(base_url(), 'refresh');
+
+		}//end else do_upload
+	}// end flash debug
 	public function regis_member(){
        $this->F->set_rules('email', 'HeyEmail', 'trim|valid_email|required');
        $this->F->set_rules('username', 'Hey debug', 'trim|required');
@@ -77,21 +175,21 @@ class User_activity extends CI_Controller{
 			);
         	$data["res"]=$this->db_model->register_user($data);
         	$data['logged']=TRUE;
-        	echo "uid is ".$data["res"]['uid']."<br>";
+        	//echo "uid is ".$data["res"]['uid']."<br>";
         	
         	//echo "<br>before exit";
         	//exit();
         	$some=$this->session->set_userdata($data);
         		$feed_data = $this->db_model->fetch_new_feed($some['uid']);
-				 echo "is admin ".$some['uid']."<br>";
+				// echo "is admin ".$some['uid']."<br>";
 				$data_pack['result']= array(
 					//'user_data'=>$data,
 					'user_data'=>$some,
 					'content_data'=>$feed_data
 					);
-				echo "<br>when register<br>";
-				print_r($some);
-				echo "<br>after register<br>";
+			//	echo "<br>when register<br>";
+			//	print_r($some);
+			//	echo "<br>after register<br>";
 
 				//exit();
 				if($data['user_stat']!='admin'){
@@ -103,8 +201,9 @@ class User_activity extends CI_Controller{
 					$this->load->view('view_gen_footer');
 				}else if($data['user_stat']==='admin'){
 					$this->load->view('view_gen_head');
-					$this->load->view('view_admin_feed',$data_pack);
 					$this->load->view("view_logout");
+					$this->load->view('view_admin_feed',$data_pack);
+					
 					$this->load->view('view_gen_footer');
 				}
         	//$this->load->view('view_user_register_result',$data["res"]);

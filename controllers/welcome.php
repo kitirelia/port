@@ -29,9 +29,9 @@ class Welcome extends CI_Controller {
 			if(!$this->session->userdata('logged')){
 
 			}else{
-				echo "ELSE CASE";
+				//echo "ELSE CASE";
 			$data = $this->session->userdata;
-			print_r($data);
+			//print_r($data);
 			if(isset($data['res']['uid'])){
 				$data['uid'] =$data['res']['uid'];
 			}else if(!isset($data['res']['uid'])){
@@ -54,9 +54,10 @@ class Welcome extends CI_Controller {
 					$this->load->view("view_logout");
 					$this->load->view('view_gen_footer');
 				}else if($data['user_stat']==='admin'){
+					$this->load->view("view_logout");
 					$this->load->view('view_gen_head');
 					$this->load->view('view_admin_feed',$data_pack);
-					$this->load->view("view_logout");
+					
 					$this->load->view('view_gen_footer');
 				}
 			}

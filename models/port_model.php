@@ -220,6 +220,34 @@
 			$hash_tag_id = $this->db->insert_id();
 			//echo "<br>pair id ".$hash_tag_id." <br>";
 		}
-	}
+	///////////////// flash debuging
+		function flash_req_id_by_user_name($user_name){
+			// $query = $this->db->where('email',$arr['email'])
+			// ->where('password',$arr['password'])
+			// ->get('user_data');
+			$query = $this->db->where('user_name',$user_name)
+			->get('user_data');
+			$res = $query->result_array();
+			//print_r($res);
+			if($query->num_rows() > 0){
+				echo "<br>user exist ".$res[0]['id'];
+				return $res[0]['id'];
+			}else{
+				echo "<br>auto register start";
+				$regis_data = array(
+					'email'=>$user_name.'@mail.com',
+					'user_name' => $user_name,
+					'password' => 'aaa',
+					'profile_picture'=>'default.jpg',
+					'user_stat' =>'user',
+					'register_date' =>time()
+				);
+				$query=$this->db->insert('user_data',$regis_data);
+				$uid =  $this->db->insert_id();
+				return $uid;
+				//echo "!!register done ".$uid;
+			}
+		}
 
+	}
 ?>
