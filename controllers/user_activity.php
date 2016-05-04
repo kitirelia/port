@@ -4,6 +4,7 @@ class User_activity extends CI_Controller{
 		
 	public function __construct(){
 		parent::__construct();
+		$this->output->set_header('Access-Control-Allow-Origin: *');
 		$this->load->model("Port_model","db_model");
 		$this->load->helper(array('html','file','form','url'));
 		$this->load->library('form_validation',NULL,'F');
@@ -56,6 +57,15 @@ class User_activity extends CI_Controller{
 			echo "Wrong rulese";
 		}
 	}
+
+	public function load_feed_more($current_page){
+		$data =$this->db_model->load_feed_more($current_page);
+		$feed_back= json_encode($data);
+		print_r($feed_back);
+		return "hello";
+		//return $feed_back;
+	}
+
 	public function flash_debug_upload(){
 		//echo "hello flash";
 		echo "debug++|".$this->input->post('debug_caption')."|++";
@@ -65,8 +75,6 @@ class User_activity extends CI_Controller{
 		$config['max_size']	= '1024*10';
 		$config['file_name'] = time()."_".$this->_random_string(10);
 		$this->load->library('upload', $config);
-
-		///echo "time debug ".$this->input->post('debug_time');
 		$user_timer = $this->input->post('debug_time');
 		if(strlen($user_timer)>0){
 			//echo "FLASH TIME|".$user_timer."|";
@@ -76,12 +84,10 @@ class User_activity extends CI_Controller{
 			//echo "server time";
 		}
 		$user_name=$this->input->post('user_name');
-		//echo "username is ".$user_name;
-
+		
 		//------- check user_id
 		$id_req = $this->db_model->flash_req_id_by_user_name($user_name);
 		echo "   user id is ".$id_req;
-		//echo "-------------------";
 		
 		if(! $this->upload->do_upload()){
 			$error = array('error' => $this->upload->display_errors());
@@ -124,13 +130,12 @@ class User_activity extends CI_Controller{
 
 		    $addData = array(
 		    	'user_id'=>$id_req,
-		    	//'caption'=>'ðŸ˜€',
 		    	'caption'=>$data['caption'],
 		    	'file_name'=>$data['image_name'],
 		    	'mime_type'=>$mime_type,
 		    	'create_date'=>$user_timer
 		    );
-			$this->db_model->debug_emoji($addData['caption']);
+			//$this->db_model->debug_emoji($addData['caption']);
 		 	$content_id = $this->db_model->addSingle_content($addData);
 		
 		 	$hash_arr= $this->_clean_for_hashtag($data['caption']);
@@ -191,11 +196,6 @@ class User_activity extends CI_Controller{
 					'user_data'=>$some,
 					'content_data'=>$feed_data
 					);
-			//	echo "<br>when register<br>";
-			//	print_r($some);
-			//	echo "<br>after register<br>";
-
-				//exit();
 				if($data['user_stat']!='admin'){
 					$this->load->view('view_gen_head');
 					$this->load->view("view_logout");
@@ -390,7 +390,6 @@ class User_activity extends CI_Controller{
 	//--------------------- DELETE POST----------
 
 	function delete_post($to_del_id){
-		//echo "to delete post id ".$to_del_id;
 		$data['result']=$this->db_model->delete_post_content($to_del_id);
 		//echo "<br>---- del result-------<br>";
 		//print_r($data['result']);

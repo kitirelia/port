@@ -15,13 +15,27 @@
 			$query = $this->db->select($table_list)
 			->join('user_data','content_data.user_id=user_data.id','LEFT')
 			->order_by('content_data.create_date','DESC')
-			->limit(300,1)
+			->limit(10,1)
 			->get('content_data');
 			$result=$query->result_array();
 			return $result;
 			
 		}
+		function load_feed_more($current_page){
+			$max_feed_per_page = 10;
+			$table_list = array(
+				'content_data.user_id','content_data.caption','content_data.file_name','content_data.create_date','content_data.post_id'
+				,'user_data.id','user_data.user_name','user_data.profile_picture','user_data.user_stat'
+				);
+			$query = $this->db->select($table_list)
+			->join('user_data','content_data.user_id=user_data.id','LEFT')
+			->order_by('content_data.create_date','DESC')
+			->limit(10,($current_page*$max_feed_per_page))
+			->get('content_data');
+			$result=$query->result_array();
+			return $result;
 
+		}
 		//--------------- se
 		function fetch_personal_content($uid){
 			//echo "model see ".$uid;

@@ -4,6 +4,7 @@ class Welcome extends CI_Controller {
 
 	public function __construct(){
 		parent::__construct();
+		$this->output->set_header('Access-Control-Allow-Origin: *');
 		$this->load->helper(array('html','file','form','url'));
 		$this->load->model("Port_model","db_model");
 		//$this->load->model("Insta_model","hey");
