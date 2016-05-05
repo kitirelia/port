@@ -4,7 +4,9 @@
 		var current_page = 1;
 	    var loading_new_feed =false;
 	    var is_going_down =false;
-	    var load_success =false;
+
+	    
+	    
 		var lastScrollTop = $(this).scrollTop();
 		$(window).scroll(function(event){
 			var st = $(this).scrollTop();
@@ -24,11 +26,6 @@
 		        	console.log("start load");
 		        	loading_new_feed =true;
 		        	show_preload();
-		        }else if(! is_going_down && load_success){
-		        	//$( "#preloading" ).remove();
-		        	//loading_new_feed =false;
-		        	//load_success =false;
-		        	//console.log('remove done');
 		        }
 		    }
 		};//end window.onscroll
@@ -44,18 +41,11 @@
 		}
 		function load_json_feed(){
 			current_page++;
-			
 			var getUrl = "http://"+window.location.host+window.location.pathname+'/user_activity/load_feed_more/'+current_page;
-			//console.log('req page '+current_page,getUrl);
 			var base_url = "http://"+window.location.host+window.location.pathname+"/user_activity/";
 			var base_img = "http://"+window.location.host+window.location.pathname+"/port/../";
-			//console.log("base url "+base_url);
 			var flickerAPI = "http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?";
-				  $.getJSON( getUrl, {
-				    tags: "mount rainier",
-				    tagmode: "any",
-				    format: "json"
-				  })
+				  $.getJSON( getUrl)
 				    .done(function( data ) {
 				    	var str ='';
 
@@ -69,6 +59,7 @@
 							str+=' 			<div class="thumbnail">';
 							str+='			<img src="'+base_img +'../uploads/thumb/'+item.file_name+'" class="img-responsive">';
 							str+='			</div>';
+							str+='			<p>'+search_hashtag(item.caption)+'</p>';
 							str+='		</div>';
 							str+='	</div>';
 						    //console.log(item.caption);
@@ -76,11 +67,37 @@
 						$( "#preloading" ).remove();
 						$( "#stupid" ).append(str);
 						loading_new_feed =false;
-						load_success =false;
+						
 				    }).fail(function() {
 					    console.log( "error" );
 					});
 		}//end load_json_feed
+		function search_hashtag(str){
+			var clean ="";
+			var white_arr = str.split(" ");
+			for (item of white_arr) {
+				if(item.indexOf('#')>=0){
+					item='<a href="www.google.com/'+(item.replace("#", ""))+'">'+item+'</a>';
+				}else if(item.indexOf('@')>=0){{
+					item=search_tag_user(item);
+				}}
+				clean+=(item+" ");
+			}
+			return clean;
+		}//end search_hashtag
+		function search_tag_user(str){
+			var kept_str = str.split('@');
+			var not_use=kept_str[0];
+			var res = str.slice(str.indexOf('@'),str.length);
+			res = res.split('@');
+			res=res.slice(1,res.length);
+			var u_str="";
+			for (node of res) {
+				node = '<a href="https://www.instagram.com/'+node+'" target="_blank" >@'+node+'</a>';
+				u_str+=node;
+			}
+			return not_use+u_str;
+		}//end search_tag_user
 	});//end $(document).ready
 	
 	
