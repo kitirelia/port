@@ -1,14 +1,16 @@
 <script type="text/javascript">
-	document.title = "New Feed";
+	//document.title = "New Feed";
 	$(document).ready(function(){
+		//var user_name
+		document.title = "hashtag";
 		var current_page = 0;
 	    var loading_new_feed =false;
 	    var is_going_down =false;
 		var lastScrollTop = $(this).scrollTop();
-		//var color_arr =['#6E6E6E','#9FF781','#F5A9A9','#F2F5A9'];
+
 		$(window).scroll(function(event){
 			var st = $(this).scrollTop();
-			$( "#debug_scroll" ).html(st+"|"+lastScrollTop);
+			//$( "#debug_scroll" ).html(st+"|"+lastScrollTop);
 			    if (st > lastScrollTop){
 			    	
 			    	is_going_down=true;
@@ -36,24 +38,23 @@
 			load_json_feed();
 		}
 		function load_json_feed(){
+			//alert('user page');
 			current_page++;
-			var getUrl = "http://"+window.location.host+'/port/index.php'+'/user_activity/load_feed_more/'+current_page;
+			//var current_user_id declare in php fetching
+			var getUrl = "http://"+window.location.host+'/port/index.php'+'/user_activity/load_user_feed_more/'+current_user_id+"/"+current_page;
 			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/";
 			var base_img = "http://"+window.location.host+'/port/index.php'+"/port/../";
-			//console.log('req '+getUrl)
+			console.log('req '+getUrl)
 				  $.getJSON( getUrl)
 				    .done(function( data ) {
 				    	console.log('get data length '+data.length);
-
 				    	var str ='';
 						for (item of data) {
-							//var timeString = moment(1439198499).format("HH:mm:ss");
-							str+='		<p>debug '+feed_debug+' post id '+item.post_id+'</p>';
+							//console.log(item);
 							str+='	<div class = "panel panel-default">';
-							//str+='	<p>'+new Date(item.create_date * 1000).format('h:i:s');+'</p>';
-							str+='		<div class="panel-body" >';
-							//console.log('index is '+(current_page%color_arr.length));
+							str+='		<div class="panel-body">';
 							//console.log(base_url+'show_content_user/'+item.user_id);
+							str+='		<p>debug '+feed_debug+' post id '+item.post_id+'</p>';
 							str+='			<a href="'+base_url+'show_content_user/'+item.user_id+'"><p class="lead">'+item.user_name+'</p></a>';
 							//console.log('			<a href="'+base_url+'show_content_user/'+item.user_id+'><p class="lead">'+item.user_name+'</p></a>');
 							str+=' 			<div class="thumbnail">';
@@ -62,6 +63,7 @@
 							str+='			<p>'+search_hashtag(item.caption)+'</p>';
 							str+='		</div>';
 							str+='	</div>';
+							feed_debug++;
 						    //console.log(item.caption);
 						}//end for
 						$( "#preloading" ).remove();
@@ -73,26 +75,14 @@
 					    console.log( "error" );
 					});
 		}//end load_json_feed
-		function translate_time(UNIX_timestamp) {
-			var a = new Date(UNIX_timestamp * 1000);
-			  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-			  var year = a.getFullYear();
-			  var month = months[a.getMonth()];
-			  var date = a.getDate();
-			  var hour = a.getHours();
-			  var min = a.getMinutes();
-			  var sec = a.getSeconds();
-			  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
-			  return time;
-		}//end translate_time
 		function search_hashtag(str){
 			var clean ="";
 			var white_arr = str.split(" ");
 			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/show_content_by_hashtag/";
 			for (item of white_arr) {
 				if(item.indexOf('#')>=0){
-					//item='<a href="'+base_url+(item.replace("#", ""))+'">'+item+'</a>';
 					item = clean_each_hash(item);
+					//item='<a href="'+base_url+(item.replace("#", ""))+'">'+item+'</a>';
 				}else if(item.indexOf('@')>=0){{
 					item=search_tag_user(item);
 				}}
@@ -114,7 +104,6 @@
 			return not_use+u_str;
 		}//end search_tag_user
 		function clean_each_hash(str){
-			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/show_content_by_hashtag/";
 			var cache_str="";
 			var arr = str.split('#');
 			var clean_str="";
@@ -188,44 +177,35 @@
 		}
 		return $cache_unuse.$_eash_tag;
 	}// end add_a_tag
-	// function _add_link_hashtag($raw_str){
-	// 	$raw_arr = explode(' ', $raw_str);
-	// 	$clean_data ="";
-	// 	foreach ($raw_arr as $data) {
-	// 		$pos = strpos( $data, '#');
-	// 		if($pos !== false){
-	// 			$string=$data;
-	// 			$string = str_replace('#', '', $string);
-	// 			$data='<a href ="'.base_url()."index.php/user_activity/show_content_by_hashtag/".$string.'">'.$data.'</a>';
-	// 		}
-	// 		$clean_data.=" ".$data;
-	// 	}
-	// 	 return $clean_data;
-	// }//end _add_link_hashtag
+
 ?>
 
 <div class='row' id="allcontent">
-	<div class="loader-inner ball-pulse "></div>
-	<div class='loader-inner ball-pulse'></div>
 		<div id="display_view">
 			<div id="content" class = "col-md-6 col-md-offset-3">
-				<div id='debug_scroll'>
-					debug here
-				</div>
-		
+	
 				<div id='stupid'>
 				<?php
-					$count=0;
+					$count = 0;
+					
+				
+					if(count($result['content_data'])>0){
+						$user_id =$result['content_data'][0] ['user_id'];
+					
+					/////////// decare javascript variable
+					echo '<script>var current_user_id = "'.$user_id . '";</script>';//decare variable
+					echo '<script>var current_user_name = "'.$result['content_data'][0] ['user_name'] . '";</script>';//decare variable
 					echo '<script>var feed_debug = "'.$count . '";</script>';//decare variable
+					///////////////////////////////
+					//echo "user id is".$user_id."<br>"."data length ".(count($result['content_data']));
 					foreach ($result['content_data'] as $data) {
-						//echo "create ".$data['create_date'];
-						echo "<br>".$count." post_id ".$data['post_id'].'<br>';
-						$count++;
-						//echo date('d/m/Y', $data['create_date']);
 						//echo base_url()."index.php/user_activity/show_content_user/";
+						//echo "<br>".$count." post_id ".$data['post_id'];
+						$count++;
+						//echo "<br>".$data['caption']."<br>";
 						echo '<script> feed_debug = "'.$count . '";</script>';//decare variable
 						echo '<div class="panel panel-default">';
-						echo '	<div class="panel-body">';
+						echo '	<div class="panel-body" style="background-color: #ADFF99;">';
 						echo ' 		<a href="'.base_url()."index.php/user_activity/show_content_user/".$data['user_id'].'"><p class="lead">'.$data['user_name'].'</p></a>';
 						echo '		<div class="thumbnail">';
 						echo '			<img src="'.base_url().'/uploads/thumb/'.$data['file_name'].'" class="img-responsive">';
@@ -236,8 +216,8 @@
 						echo '</p>';
 						echo '	</div>';
 						echo "</div>";
-					}
-
+					}//end foreach
+					}//end if
 				?>
 				</div>
 			</div>

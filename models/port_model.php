@@ -15,12 +15,13 @@
 			$query = $this->db->select($table_list)
 			->join('user_data','content_data.user_id=user_data.id','LEFT')
 			->order_by('content_data.create_date','DESC')
-			->limit(10,1)
+			->limit(10)
 			->get('content_data');
 			$result=$query->result_array();
 			return $result;
 			
 		}
+		////////// req that return for load more..
 		function load_feed_more($current_page){
 			$max_feed_per_page = 10;
 			$table_list = array(
@@ -30,12 +31,29 @@
 			$query = $this->db->select($table_list)
 			->join('user_data','content_data.user_id=user_data.id','LEFT')
 			->order_by('content_data.create_date','DESC')
-			->limit(10,($current_page*$max_feed_per_page))
+			->limit($max_feed_per_page,($current_page*$max_feed_per_page))
 			->get('content_data');
 			$result=$query->result_array();
 			return $result;
 
 		}
+		function  load_user_feed_more($u_id,$page_res){
+			$max_feed_per_page = 10;
+			//echo $max_feed_per_page."|".($max_feed_per_page*$page_res);
+			$table_list = array(
+				'content_data.user_id','content_data.caption','content_data.file_name','content_data.create_date','content_data.post_id'
+				,'user_data.id','user_data.user_name','user_data.profile_picture','user_data.user_stat'
+			);
+			$query = $this->db->select($table_list)
+			->join('user_data','content_data.user_id=user_data.id','LEFT')
+			->where('content_data.user_id',$u_id)
+			->order_by('content_data.create_date','DESC')
+			->limit($max_feed_per_page,($max_feed_per_page*$page_res))
+			->get('content_data');
+			$result=$query->result_array();
+			//print_r($result);
+			return $result;
+		}//end load_user_feed_more
 		//--------------- se
 		function fetch_personal_content($uid){
 			//echo "model see ".$uid;
@@ -47,7 +65,7 @@
 			->join('user_data','content_data.user_id=user_data.id','LEFT')
 			->where('content_data.user_id',$uid)
 			->order_by('content_data.create_date','DESC')
-			->limit(200)
+			->limit(10)
 			->get('content_data');
 			$result=$query->result_array();
 
@@ -55,11 +73,15 @@
 
 		}
 		function fetch_hashtag_content($hashtag){
-
+			//echo "search of "+$hashtag+"<br>";
+			//$hashtag =trim( preg_replace( "/[^0-9a-z]+/i", "", $hashtag) );	
+			//echo "but clean "+$hashtag;
 			$hash_id_query = $this->db
 			->where('hashtag_name',$hashtag)
 			->get('hashtag_stat');
 			$hash_res=$hash_id_query->result_array();
+			//print_r($hash_res);
+			//echo "<br>----------------<br>";
 			if(count($hash_res)>0){
 				$hash_id = $hash_res[0]['id'];
 				//echo "# id is ".$hash_id.'<br>';
@@ -70,6 +92,7 @@
 				$query= $this->db->select($table_list)
 				->join('content_data','hashtag_content.content_post_id = content_data.post_id','INNER')
 				->where('hashtag_content.hashtag_id',$hash_id)
+				->limit(10)
 				->get('hashtag_content');
 				$pair_data=$query->result_array();
 				//print_r($pair_data);
@@ -160,6 +183,7 @@
 			return $clean;
 		}
 		function register_user($data){
+			//echo "before error";
 			$query=$this->db->insert('user_data',$data);
 			if(!$query){
 				$errNo   = $this->db->_error_number();

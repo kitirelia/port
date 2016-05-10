@@ -57,15 +57,29 @@ class User_activity extends CI_Controller{
 			echo "Wrong rulese";
 		}
 	}
-
+	/////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
+	/////////////////  RETURN JSON //////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 	public function load_feed_more($current_page){
 		$data =$this->db_model->load_feed_more($current_page);
 		$feed_back= json_encode($data);
 		print_r($feed_back);
-		return "hello";
+		//return "hello";
 		//return $feed_back;
 	}
-
+	public function load_user_feed_more($current_uid,$page_to_feed){
+		//echo "request from ".$current_uid." page is ".$page_to_feed;
+		$data = $this->db_model->load_user_feed_more($current_uid,$page_to_feed);
+		$feed_back = json_encode($data);
+		echo $feed_back;
+	}
+	/////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
+	/////////////////   END RETURN JSON /////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 	public function flash_debug_upload(){
 		//echo "hello flash";
 		echo "debug++|".$this->input->post('debug_caption')."|++";
@@ -184,10 +198,7 @@ class User_activity extends CI_Controller{
 			);
         	$data["res"]=$this->db_model->register_user($data);
         	$data['logged']=TRUE;
-        	//echo "uid is ".$data["res"]['uid']."<br>";
-        	
-        	//echo "<br>before exit";
-        	//exit();
+
         	$some=$this->session->set_userdata($data);
         		$feed_data = $this->db_model->fetch_new_feed($some['uid']);
 				// echo "is admin ".$some['uid']."<br>";
@@ -235,18 +246,18 @@ class User_activity extends CI_Controller{
 					);
 		
 		if(!$this->session->userdata('logged')){
-			$this->load->view('view_gen_head');
+			$this->load->view('view_user_head');
 			$this->load->view('view_nav_user_bar');
 			$this->load->view("view_login_form");
 			//$this->load->view('view_form_upload');
-			$this->load->view('view_new_feed',$data_pack);
+			$this->load->view('view_user_feed',$data_pack);
 			//$this->load->view("view_logout");
 			$this->load->view('view_gen_footer');
 		}else{
-			$this->load->view('view_gen_head');
+			$this->load->view('view_user_head');
 			$this->load->view('view_nav_user_bar');
 			$this->load->view('view_form_upload');
-			$this->load->view('view_new_feed',$data_pack);
+			$this->load->view('view_user_feed',$data_pack);
 			$this->load->view("view_logout");
 			$this->load->view('view_gen_footer');
 		}
@@ -254,12 +265,10 @@ class User_activity extends CI_Controller{
 
 //--------------- ## hashtag search ----
 	public function show_content_by_hashtag($hashtag){
-		//echo "#".$hashtag;
+		$hashtag = urldecode($hashtag);
+
+		//echo "____>|".$hashtag."|";
 		$data['hash_result'] = $this->db_model->fetch_hashtag_content($hashtag);
-		// foreach ($data['hash_result'] as $key) {
-		// 	//print_r($key);
-		// 	//echo "<br>----<br>";
-		// }
 		if(!$this->session->userdata('logged')){
 			$data_pack['result'] = array(
 			'user_data'=>array(),
@@ -269,7 +278,7 @@ class User_activity extends CI_Controller{
 			$this->load->view('view_nav_user_bar');
 			$this->load->view("view_login_form");
 			//$this->load->view('view_form_upload');
-			$this->load->view('view_new_feed',$data_pack);
+			$this->load->view('view_tag_feed',$data_pack);
 			//$this->load->view("view_logout");
 			$this->load->view('view_gen_footer');
 
@@ -281,7 +290,7 @@ class User_activity extends CI_Controller{
 			$this->load->view('view_gen_head');
 			$this->load->view('view_nav_user_bar');
 			$this->load->view('view_form_upload');
-			$this->load->view('view_new_feed',$data_pack);
+			$this->load->view('view_tag_feed',$data_pack);
 			$this->load->view("view_logout");
 			$this->load->view('view_gen_footer');
 		}
@@ -296,7 +305,7 @@ class User_activity extends CI_Controller{
 		$config['max_size']	= '1024*10';
 		$config['file_name'] = time()."_".$this->_random_string(10);
 		$this->load->library('upload', $config);
-
+		echo "caption is ".$this->input->post('caption')."<br>-----------------";
 		///echo "time debug ".$this->input->post('debug_time');
 		$user_timer = $this->input->post('debug_time');
 		//echo "incoming time ".strlen($user_timer);
@@ -379,7 +388,8 @@ class User_activity extends CI_Controller{
 				//echo "pass #check step";
 			}
 			//echo "<br>-----------ALL DONE-----------------";
-			redirect(base_url(), 'refresh');
+			echo "not redirect";
+			//redirect(base_url(), 'refresh');
 
 		}//end else do_upload
 		
@@ -419,12 +429,15 @@ class User_activity extends CI_Controller{
 					foreach ($inside_clean as $inside_data) {
 						if($inside_data!==''){
 							$inside_data = $this->clean_spacial_character($inside_data);
+						//	$inside_data = strtolower($inside_data);
 							array_push($hash_raw,$inside_data);
 						}
 					}
 				}else{
 					//echo "push ".$data.'</br>';
 					$data = $this->clean_spacial_character($data);
+
+					//$hashtag = strtolower($hashtag);
 					array_push($hash_raw,$data);
 				}
 			}else{
@@ -439,18 +452,5 @@ class User_activity extends CI_Controller{
 	  // return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
 	    return $string;
 	}//end clean_spacial_character
-	function _add_link_hashtag($raw_str){
-		$raw_arr = explode(' ', $raw_str);
-		$clean_data ="";
-		foreach ($raw_arr as $data) {
-			$pos = strpos( $data, '#');
-			if($pos !== false){
-				echo $pos." ->".$data."<br>";
-				$data='<a href ="http://www.google.com/'.$data.'">'.$data.'</a>';
-			}
-			$clean_data.=" ".$data;
-		}
-		 return $clean_data;
-		//return 'hello';
-	}//end _add_link_hashtag
+	
 }
