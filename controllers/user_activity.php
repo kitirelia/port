@@ -69,6 +69,11 @@ class User_activity extends CI_Controller{
 		//return "hello";
 		//return $feed_back;
 	}
+	public function load_hashtag_more($current_tag,$page_to_feed){
+		$data = $this->db_model->load_tag_feed_more($current_tag,$page_to_feed);
+		$feed_back = json_encode($data);
+		echo $feed_back;
+	}
 	public function load_user_feed_more($current_uid,$page_to_feed){
 		//echo "request from ".$current_uid." page is ".$page_to_feed;
 		$data = $this->db_model->load_user_feed_more($current_uid,$page_to_feed);
@@ -272,6 +277,7 @@ class User_activity extends CI_Controller{
 		if(!$this->session->userdata('logged')){
 			$data_pack['result'] = array(
 			'user_data'=>array(),
+			'search_tag'=>$hashtag,
 			'content_data'=>$data['hash_result']
 			);
 			$this->load->view('view_gen_head');
@@ -285,6 +291,7 @@ class User_activity extends CI_Controller{
 		}else{//login
 			$data_pack['result'] = array(
 			'user_data'=>array(),
+			'search_tag'=>$hashtag,
 			'content_data'=>$data['hash_result']
 			);
 			$this->load->view('view_gen_head');

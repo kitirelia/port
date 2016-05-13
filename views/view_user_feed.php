@@ -3,11 +3,12 @@
 	$(document).ready(function(){
 		//document.title = "Wait name";
 		document.title = current_user_name;
-		var current_page = 0;
+		var current_page = 1;
 	    var loading_new_feed =false;
 	    var is_going_down =false;
 		var lastScrollTop = $(this).scrollTop();
 		var tab_length=9;
+		var ul_debug_count=0;
 
 		$(window).scroll(function(event){
 			var st = $(this).scrollTop();
@@ -40,7 +41,7 @@
 		}
 		function load_json_feed(){
 			//alert('user page');
-			current_page++;
+			
 			//var current_user_id declare in php fetching
 			var getUrl = "http://"+window.location.host+'/port/index.php'+'/user_activity/load_user_feed_more/'+current_user_id+"/"+current_page;
 			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/";
@@ -48,11 +49,15 @@
 			console.log('req '+getUrl)
 				  $.getJSON( getUrl)
 				    .done(function( data ) {
-				    	var str ='<ul class ="'+current_page+'">';//<ul class="row first">
-
+				    	
+				    	if(data.length>0){
+				    		current_page++;
+				    		ul_debug_count++;
+				    	
+				    	var str ='<ul id=new_ul'+ul_debug_count+' class ="row '+current_page+'">';//<ul class="row first">
 						for (item of data) {
 							//tab_length++;
-							str+='<li class="start" ">';
+							str+='<li class="start">';
 							str+='<img src="'+base_img +'../uploads/fullsize/'+item.file_name+'" class="img-responsive">';
 							str+='<div class="text" hidden>';
 							str+=search_hashtag(item.caption);
@@ -68,20 +73,23 @@
 						    //console.log(item.caption);
 						}//end for
 						//console.log("---");
-						str+='<ul>';
-						$( "#preloading" ).remove();
+						str+='</ul>';
+						$( "#preloading" ).remove(); 
 						//$( "#stupid" ).append(str);
 						$('#stupid').append(str);
-						$('ul.'+current_page+'').bsPhotoGallery({
+						
+						$( "#new_ul"+ul_debug_count ).bsPhotoGallery({//properly
+						//$('ul.'+current_page+'').bsPhotoGallery({
 				          "classes" : "col-lg-2 col-md-4 col-sm-3 col-xs-4 col-xxs-12",
 				          "hasModal" : true
 				        });
 						loading_new_feed =false;
-						
+						}//end if data length
 				    }).fail(function() {
 				    	
 					    console.log( "error" );
 					});
+
 		}//end load_json_feed
 
 
@@ -95,7 +103,7 @@
 			//console.log('req '+getUrl)
 				  $.getJSON( getUrl)
 				    .done(function( data ) {
-				    	console.log('get data length '+data.length);
+				    	//console.log('get data length '+data.length);
 
 				    	var str ='';
 						for (item of data) {
@@ -153,8 +161,10 @@
 			return not_use+u_str;
 		}//end search_tag_user
 
-		
-		$('ul.first').bsPhotoGallery({//properly
+		start_ul
+		//$('ul.first')
+		$( "#start_ul" ).bsPhotoGallery({//properly
+		//$('ul.first').bsPhotoGallery({//properly
           "classes" : "col-lg-2 col-md-4 col-sm-3 col-xs-4 col-xxs-12",
           "hasModal" : true
         });//end bsPhotoGallery
@@ -292,7 +302,7 @@
 					echo '<script>var current_user_name = "'.$result['content_data'][0] ['user_name'] . '";</script>';//decare variable
 					echo '<script>var feed_debug = "'.$count . '";</script>';//decare variable
 					// ///////////////////////////////
-					echo '<ul class="row first">';
+					echo '<ul id="start_ul" class="row first">';
 					foreach ($result['content_data'] as $data) {
 						echo '<li>';
 						echo '	<img src="'.base_url().'/uploads/fullsize/'.$data['file_name'].'">';
@@ -306,11 +316,11 @@
 				?>
 	</div>
 </div>
-<div class='row' id="allcontent">
-		<!-- <div id="display_view">
-			<div id="content" class = "col-md-6 col-md-offset-3">
+<div class='row' id="allcontent3">
+		<div id="display_view3">
+			<div id="content3" class = "col-md-6 col-md-offset-3">
 	
-				<div id='stupid'> -->
+				<div id='stupid8'> 
 				 <?php
 				// 	echo '<ul class="row first">';
 				// 	foreach ($result['content_data'] as $data) {
@@ -362,18 +372,3 @@
 		
 	</div>
 
-<!-- <div class='container'>
-		<div class='row'>
-			<?php
-				if($this->session->userdata('stat')>=1){//Success
-					echo "<p>Success</p>";
-					echo "<p>Hello ".$this->session->userdata('user_name')."</p>";
-					echo "<p>email ".$this->session->userdata('email')."</p>";
-					echo "<p>image ".$this->session->userdata('profile_picture')."</p>";
-				}else{
-					echo "<p>fail</p>";
-				}
-			?>
-		<div> //end row
-
-</div> -->

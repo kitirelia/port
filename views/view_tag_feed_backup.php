@@ -3,7 +3,7 @@
 	$(document).ready(function(){
 		//var user_name
 		document.title = "#"+set_tile;
-		var current_page = 1;
+		var current_page = 0;
 	    var loading_new_feed =false;
 	    var is_going_down =false;
 		var lastScrollTop = $(this).scrollTop();
@@ -39,37 +39,30 @@
 		}
 		function load_json_feed(){
 			//alert('user page');
-			
+			current_page++;
 			//var current_user_id declare in php fetching
-			var getUrl = "http://"+window.location.host+'/port/index.php'+'/user_activity/load_hashtag_more/'+current_hashtag+"/"+current_page;
+			var getUrl = "http://"+window.location.host+'/port/index.php'+'/user_activity/load_user_feed_more/'+current_user_id+"/"+current_page;
 			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/";
 			var base_img = "http://"+window.location.host+'/port/index.php'+"/port/../";
 			console.log('req '+getUrl)
 				  $.getJSON( getUrl)
 				    .done(function( data ) {
-				    	
-				    	if(data.length>0){
-				    		current_page++;
-				    	}
 				    	console.log('get data length '+data.length);
 				    	var str ='';
 						for (item of data) {
 							//console.log(item);
-							str+= "<div  class = 'jonat-thumbnail'>";
-							str+= "<img id='hash_img"+feed_debug+"' src='"+base_img+"../uploads/thumb/"+item.file_name+"'  >";
-							str+= "</div>";
-							// str+='	<div class = "panel panel-default">';
-							// str+='		<div class="panel-body">';
-							// //console.log(base_url+'show_content_user/'+item.user_id);
-							// str+='		<p>debug '+feed_debug+' post id '+item.post_id+'</p>';
-							// str+='			<a href="'+base_url+'show_content_user/'+item.user_id+'"><p class="lead">'+item.user_name+'</p></a>';
-							// //console.log('			<a href="'+base_url+'show_content_user/'+item.user_id+'><p class="lead">'+item.user_name+'</p></a>');
-							// str+=' 			<div class="thumbnail">';
-							// str+='			<img src="'+base_img +'../uploads/thumb/'+item.file_name+'" class="img-responsive">';
-							// str+='			</div>';
-							// str+='			<p>'+search_hashtag(item.caption)+'</p>';
-							// str+='		</div>';
-							// str+='	</div>';
+							str+='	<div class = "panel panel-default">';
+							str+='		<div class="panel-body">';
+							//console.log(base_url+'show_content_user/'+item.user_id);
+							str+='		<p>debug '+feed_debug+' post id '+item.post_id+'</p>';
+							str+='			<a href="'+base_url+'show_content_user/'+item.user_id+'"><p class="lead">'+item.user_name+'</p></a>';
+							//console.log('			<a href="'+base_url+'show_content_user/'+item.user_id+'><p class="lead">'+item.user_name+'</p></a>');
+							str+=' 			<div class="thumbnail">';
+							str+='			<img src="'+base_img +'../uploads/thumb/'+item.file_name+'" class="img-responsive">';
+							str+='			</div>';
+							str+='			<p>'+search_hashtag(item.caption)+'</p>';
+							str+='		</div>';
+							str+='	</div>';
 							feed_debug++;
 						    //console.log(item.caption);
 						}//end for
@@ -115,7 +108,6 @@
 			var arr = str.split('#');
 			var clean_str="";
 			var count_check=0;
-			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/";
 			if(str.indexOf('#')>0){
 				cache_str = arr[0];
 			}
@@ -132,17 +124,6 @@
 			}
 			return cache_str+clean_str;
 		}//end clean each hash
-
-		$('img').on('load', function() {
-	    	//console.log('image load success width '+$(this).width()+"x "+$(this).height());
-	    	if(($(this).attr('id').indexOf('hash_img'))>=0){
-		    	if($(this).width()>$(this).height()){
-		    		$(this).addClass( "crop_for_h  " );
-		    	}else{
-		    		$(this).addClass( "crop_for_v " );
-		    	}
-		    }
-		});//end $('img').on('load', function() {
 	});//end $(document).ready
 	
 	
@@ -171,38 +152,6 @@
 		color: #286090;
 		border-style: solid;
     	border-color: #CCC;
-	}
-
-
-	/*crop engine*/
-	.jonat-thumbnail {
-			float: left;
-		  position: relative;
-		  width: 275px;
-		  height: 275px;
-		 /* background-color: black;*/
-		  overflow: hidden;
-		  margin:10px;
-		}
-	.crop_for_h {
-		  position: absolute;
-		  left: 50%;
-		  top: 50%;
-		  height: 100%;
-		  width: auto;
-		  -webkit-transform: translate(-50%,-50%);
-		      -ms-transform: translate(-50%,-50%);
-		          transform: translate(-50%,-50%);
-	}
-	.crop_for_v {
-		  position: absolute;
-		  left: 50%;
-		  top: 50%;
-		  height: auto;
-		  width: 100%;
-		  -webkit-transform: translate(-50%,-50%);
-		      -ms-transform: translate(-50%,-50%);
-		          transform: translate(-50%,-50%);
 	}
 </style>
 <?php
@@ -249,8 +198,8 @@
 
 ?>
 
-<div  id="allcontent"  class='row' style=" background-color: #fafafa";>
-		
+<div class='row' id="allcontent">
+		<div id="display_view">
 			<div id='hashtag_head' class = "col-md-6 col-md-offset-3 easy_frame" style="text-align: center;">
 				<span class='show_tag_head'>#<?php echo $result['search_tag']; ?></span>
 				<?php 
@@ -259,51 +208,59 @@
 				?> 
 
 			</div>
-
-			<div id="content" class = "col-md-8 col-md-offset-2">
-				
+			<div id="content" class = "col-md-6 col-md-offset-3">
+				<div id='stupid'>
 				<?php
 					$count = 0;
 					if(count($result['content_data'])>0){
 						$user_id =$result['content_data'][0] ['user_id'];
 						/////////// decare javascript variable
-						echo '<script>var current_hashtag = "'.$result['search_tag'] . '";</script>';//decare variable
+						echo '<script>var current_user_id = "'.$user_id . '";</script>';//decare variable
 						echo '<script>var current_user_name = "'.$result['content_data'][0] ['user_name'] . '";</script>';//decare variable
 						echo '<script>var feed_debug = "'.$count . '";</script>';//decare variable
 						///////////////////////////////
 						//echo "user id is".$user_id."<br>"."data length ".(count($result['content_data']));
-						echo "<div id ='stupid' class ='container'>";
-						//echo "<ul>";
 						foreach ($result['content_data'] as $data) {
-							echo "<div  class = 'jonat-thumbnail'>";
-							echo "<img id='hash_img".$count."' src='".base_url()."/uploads/thumb/".$data['file_name']."'  >";
-							echo "</div>";
+							//echo base_url()."index.php/user_activity/show_content_user/";
+							//echo "<br>".$count." post_id ".$data['post_id'];
 							$count++;
+							//echo "<br>".$data['caption']."<br>";
+							echo '<script> feed_debug = "'.$count . '";</script>';//decare variable
+							echo '<div class="panel panel-default">';
+							echo '	<div class="panel-body" style="background-color: #ADFF99;">';
+							echo ' 		<a href="'.base_url()."index.php/user_activity/show_content_user/".$data['user_id'].' target="_self" "><p class="lead">'.$data['user_name'].'</p></a>';
+							echo '		<div class="thumbnail">';
+							echo '			<img src="'.base_url().'/uploads/thumb/'.$data['file_name'].'" class="img-responsive">';
+							echo '		</div>';
+							echo '<p>';
+							$data['caption'] = _add_link_hashtag($data['caption']);
+								echo $data['caption'];
+							echo '</p>';
+							echo '	</div>';
+							echo "</div>";
 						}//end foreach
-						//echo "</ul>";
-						echo "</div>";
 					}//end if
 					else{
 						echo "<div class='no_hashtag'>No data</div>";
 					}
 				?>
-				
+				</div>
 			</div>
 
-		
+		</div>
 	</div>
 
 <div class='container'>
 		<div class='row'>
 			<?php
-				// if($this->session->userdata('stat')>=1){//Success
-				// 	echo "<p>Success</p>";
-				// 	echo "<p>Hello ".$this->session->userdata('user_name')."</p>";
-				// 	echo "<p>email ".$this->session->userdata('email')."</p>";
-				// 	echo "<p>image ".$this->session->userdata('profile_picture')."</p>";
-				// }else{
-				// 	echo "<p>fail</p>";
-				// }
+				if($this->session->userdata('stat')>=1){//Success
+					echo "<p>Success</p>";
+					echo "<p>Hello ".$this->session->userdata('user_name')."</p>";
+					echo "<p>email ".$this->session->userdata('email')."</p>";
+					echo "<p>image ".$this->session->userdata('profile_picture')."</p>";
+				}else{
+					echo "<p>fail</p>";
+				}
 			?>
 		<div> <!-- end class row -->
 </div>

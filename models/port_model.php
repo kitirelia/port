@@ -54,6 +54,56 @@
 			//print_r($result);
 			return $result;
 		}//end load_user_feed_more
+		function load_tag_feed_more($hashtag,$page_res){
+			$max_feed_per_page = 12;
+			//echo "search of "+$hashtag+"<br>";
+			//$hashtag =trim( preg_replace( "/[^0-9a-z]+/i", "", $hashtag) );	
+			//echo "but clean "+$hashtag;
+			$hash_id_query = $this->db
+			->where('hashtag_name',$hashtag)
+			->get('hashtag_stat');
+			$hash_res=$hash_id_query->result_array();
+			//print_r($hash_res);
+			//echo "<br>----------------<br>";
+			if(count($hash_res)>0){
+				$hash_id = $hash_res[0]['id'];
+				//echo "# id is ".$hash_id.'<br>';
+				$table_list = array(
+					'content_data.user_id','content_data.caption','content_data.file_name','content_data.create_date','content_data.post_id'
+					,'hashtag_content.content_post_id','hashtag_content.hashtag_id'
+					);
+				$query= $this->db->select($table_list)
+				->join('content_data','hashtag_content.content_post_id = content_data.post_id','INNER')
+				->where('hashtag_content.hashtag_id',$hash_id)
+				->limit($max_feed_per_page,($max_feed_per_page*$page_res))
+				->get('hashtag_content');
+				$pair_data=$query->result_array();
+				//print_r($pair_data);
+				//echo count($pair_data)." users <br>";
+
+				for($i=0;$i<count($pair_data);$i++){
+					$sub_table_list = array(
+						'content_data.user_id','content_data.caption','content_data.file_name','content_data.create_date','content_data.post_id'
+						,'user_data.id','user_data.user_name','user_data.profile_picture','user_data.user_stat'
+						);
+					// //echo "uid ".$single_data['user_id']; 
+					$user_query=$this->db
+					->where('user_data.id',$pair_data[$i]['user_id'])
+					->get('user_data');
+					$user_and_conten_data = $user_query->result_array();
+					$pair_data[$i]['user_name']=$user_and_conten_data[0]['user_name'];
+					$pair_data[$i]['profile_picture']=$user_and_conten_data[0]['profile_picture'];
+					$pair_data[$i]['user_stat']=$user_and_conten_data[0]['user_stat'];
+					
+					//print_r($pair_data[$i]['caption']);
+					//echo "-----------------<br>";
+				}
+				return $pair_data;
+			
+			}else{
+				return array();
+			}
+		}
 		//--------------- se
 		function fetch_personal_content($uid){
 			//echo "model see ".$uid;
@@ -92,7 +142,7 @@
 				$query= $this->db->select($table_list)
 				->join('content_data','hashtag_content.content_post_id = content_data.post_id','INNER')
 				->where('hashtag_content.hashtag_id',$hash_id)
-				->limit(10)
+				->limit(12)
 				->get('hashtag_content');
 				$pair_data=$query->result_array();
 				//print_r($pair_data);

@@ -8,7 +8,7 @@
 		//var color_arr =['#6E6E6E','#9FF781','#F5A9A9','#F2F5A9'];
 		$(window).scroll(function(event){
 			var st = $(this).scrollTop();
-			$( "#debug_scroll" ).html(st+"|"+lastScrollTop);
+			//$( "#debug_scroll" ).html(st+"|"+lastScrollTop);
 			    if (st > lastScrollTop){
 			    	
 			    	is_going_down=true;
@@ -54,7 +54,7 @@
 							str+='		<div class="panel-body" >';
 							//console.log('index is '+(current_page%color_arr.length));
 							//console.log(base_url+'show_content_user/'+item.user_id);
-							str+='			<a href="'+base_url+'show_content_user/'+item.user_id+'"><p class="lead">'+item.user_name+'</p></a>';
+							str+='			<a href="'+base_url+'show_content_user/'+item.user_id+'" target="_self"><p class="lead">'+item.user_name+'</p></a>';
 							//console.log('			<a href="'+base_url+'show_content_user/'+item.user_id+'><p class="lead">'+item.user_name+'</p></a>');
 							str+=' 			<div class="thumbnail">';
 							str+='			<img src="'+base_img +'../uploads/thumb/'+item.file_name+'" class="img-responsive">';
@@ -178,7 +178,7 @@
 		}
 		foreach ($_eachword as $_subword) {
 			if(!empty($_subword) && $_subword!==$cache_unuse){
-				$_eash_tag .= "<a href='".base_url()."index.php/user_activity/show_content_by_hashtag/".$_subword."' target='_blank'>#".$_subword."</a>";
+				$_eash_tag .= "<a href='".base_url()."index.php/user_activity/show_content_by_hashtag/".$_subword."' target='_self'>#".$_subword."</a>";
 			}
 			else if(empty($_subword) && $count>0){
 			// 	echo "BANG!!!<br>";
@@ -205,12 +205,12 @@
 ?>
 
 <div class='row' id="allcontent">
-	<div class="loader-inner ball-pulse "></div>
-	<div class='loader-inner ball-pulse'></div>
+	<!-- <div class="loader-inner ball-pulse "></div>
+	<div class='loader-inner ball-pulse'></div> -->
 		<div id="display_view">
 			<div id="content" class = "col-md-6 col-md-offset-3">
 				<div id='debug_scroll'>
-					debug here
+					
 				</div>
 		
 				<div id='stupid'>
@@ -219,7 +219,7 @@
 					echo '<script>var feed_debug = "'.$count . '";</script>';//decare variable
 					foreach ($result['content_data'] as $data) {
 						//echo "create ".$data['create_date'];
-						echo "<br>".$count." post_id ".$data['post_id'].'<br>';
+						//echo "<br>".$count." post_id ".$data['post_id'].'<br>';
 						$count++;
 						//echo date('d/m/Y', $data['create_date']);
 						//echo base_url()."index.php/user_activity/show_content_user/";
