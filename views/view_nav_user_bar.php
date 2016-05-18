@@ -19,6 +19,7 @@
 	}
 	#nav_content{
 		margin:20px;
+		border-bottom: 1px solid #dbdbdb;
 		/*border-bottom: 1px solid #dbdbdb;*/
 	}
 	

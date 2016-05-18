@@ -253,8 +253,6 @@ class User_activity extends CI_Controller{
 		if(!$this->session->userdata('logged')){
 			$this->load->view('view_user_head');
 			$this->load->view('view_nav_user_bar');
-			//$this->load->view("view_login_form");
-			//$this->load->view('view_form_upload');
 			$this->load->view('view_user_feed',$data_pack);
 			//$this->load->view("view_logout");
 			$this->load->view('view_gen_footer');

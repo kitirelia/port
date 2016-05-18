@@ -10,7 +10,7 @@
 	<?php echo js_asset('bootstrap.js'); ?>
 	<?php echo js_asset('edit_jquery.bsPhotoGallery.js'); ?>
 	
-	<?php echo "string"; ?>
+	
 	<style type="text/css">
 		.h3text{
 			text-align: center;

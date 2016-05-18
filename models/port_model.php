@@ -56,9 +56,6 @@
 		}//end load_user_feed_more
 		function load_tag_feed_more($hashtag,$page_res){
 			$max_feed_per_page = 12;
-			//echo "search of "+$hashtag+"<br>";
-			//$hashtag =trim( preg_replace( "/[^0-9a-z]+/i", "", $hashtag) );	
-			//echo "but clean "+$hashtag;
 			$hash_id_query = $this->db
 			->where('hashtag_name',$hashtag)
 			->get('hashtag_stat');
@@ -161,9 +158,13 @@
 				->limit(12)
 				->get('hashtag_content');
 				$pair_data=$query->result_array();
+
+				////////////// all post count //////////////////////
 				//print_r($pair_data);
 				//echo count($pair_data)." users <br>";
-
+				/////////////////////////////////
+				$all_post_content=$query->num_rows();
+				//echo "all post ".$all_post_content;
 				for($i=0;$i<count($pair_data);$i++){
 					$sub_table_list = array(
 						'content_data.user_id','content_data.caption','content_data.file_name','content_data.create_date','content_data.post_id'

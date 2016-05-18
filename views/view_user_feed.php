@@ -1,256 +1,90 @@
 <script type="text/javascript">
 	//document.title = "New Feed";
 	$(document).ready(function(){
-		//document.title = "Wait name";
-		document.title = current_user_name;
-		var current_page = 1;
-	    var loading_new_feed =false;
-	    var is_going_down =false;
-		var lastScrollTop = $(this).scrollTop();
-		var tab_length=9;
-		var ul_debug_count=0;
-
-		$(window).scroll(function(event){
-			var st = $(this).scrollTop();
-			//$( "#debug_scroll" ).html(st+"|"+lastScrollTop);
-			    if (st > lastScrollTop){
-			    	
-			    	is_going_down=true;
-			   } else {
-			   		
-			   		is_going_down=false;
-			   }
-			   lastScrollTop = st;
-			});
-	    window.onscroll = function(ev) {
-		    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-		        if(is_going_down && !loading_new_feed){
-		        	console.log("start load");
-		        	loading_new_feed =true;
-		        	show_preload();
-		        }
-		    }
-		};//end window.onscroll
-
-		function show_preload(){
-		   	var data ="<div id='preloading'>";
-		   	data+="<p> Preload HERE<p>";
-		   	data +=" </div> ";
-			$( "#stupid" ).append(data);
-			load_json_feed();
-		}
-		function load_json_feed(){
-			//alert('user page');
-			
-			//var current_user_id declare in php fetching
-			var getUrl = "http://"+window.location.host+'/port/index.php'+'/user_activity/load_user_feed_more/'+current_user_id+"/"+current_page;
-			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/";
-			var base_img = "http://"+window.location.host+'/port/index.php'+"/port/../";
-			console.log('req '+getUrl)
-				  $.getJSON( getUrl)
-				    .done(function( data ) {
-				    	
-				    	if(data.length>0){
-				    		current_page++;
-				    		ul_debug_count++;
-				    	
-				    	var str ='<ul id=new_ul'+ul_debug_count+' class ="row '+current_page+'">';//<ul class="row first">
-						for (item of data) {
-							//tab_length++;
-							str+='<li class="start">';
-							str+='<img src="'+base_img +'../uploads/fullsize/'+item.file_name+'" class="img-responsive">';
-							str+='<div class="text" hidden>';
-							str+=search_hashtag(item.caption);
-							str+='</div>';
-							str+='</li>';
-							// str+='<li class="col-lg-2 col-md-4 col-sm-3 col-xs-4 col-xxs-12 bspHasModal" data-bsp-li-index="'+tab_length+'">';
-							// str+='<img src="'+base_img +'../uploads/fullsize/'+item.file_name+'" class="img-responsive">';
-							// str+='<div class="text">';
-							// str+=search_hashtag(item.caption);
-							// str+='</div>';
-							// str+='</li>';
-							feed_debug++;
-						    //console.log(item.caption);
-						}//end for
-						//console.log("---");
-						str+='</ul>';
-						$( "#preloading" ).remove(); 
-						//$( "#stupid" ).append(str);
-						$('#stupid').append(str);
-						
-						$( "#new_ul"+ul_debug_count ).bsPhotoGallery({//properly
-						//$('ul.'+current_page+'').bsPhotoGallery({
-				          "classes" : "col-lg-2 col-md-4 col-sm-3 col-xs-4 col-xxs-12",
-				          "hasModal" : true
-				        });
-						loading_new_feed =false;
-						}//end if data length
-				    }).fail(function() {
-				    	
-					    console.log( "error" );
-					});
-
-		}//end load_json_feed
-
-
-		function load_json_feed2(){
-			//alert('user page');
-			current_page++;
-			//var current_user_id declare in php fetching
-			var getUrl = "http://"+window.location.host+'/port/index.php'+'/user_activity/load_user_feed_more/'+current_user_id+"/"+current_page;
-			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/";
-			var base_img = "http://"+window.location.host+'/port/index.php'+"/port/../";
-			//console.log('req '+getUrl)
-				  $.getJSON( getUrl)
-				    .done(function( data ) {
-				    	//console.log('get data length '+data.length);
-
-				    	var str ='';
-						for (item of data) {
-							//console.log(item);
-							str+='	<div class = "panel panel-default">';
-							str+='		<div class="panel-body">';
-							//console.log(base_url+'show_content_user/'+item.user_id);
-							str+='		<p>debug '+feed_debug+' post id '+item.post_id+'</p>';
-							str+='			<a href="'+base_url+'show_content_user/'+item.user_id+'"><p class="lead">'+item.user_name+'</p></a>';
-							//console.log('			<a href="'+base_url+'show_content_user/'+item.user_id+'><p class="lead">'+item.user_name+'</p></a>');
-							str+=' 			<div class="thumbnail">';
-							str+='			<img src="'+base_img +'../uploads/thumb/'+item.file_name+'" class="img-responsive">';
-							str+='			</div>';
-							str+='			<p>'+search_hashtag(item.caption)+'</p>';
-							str+='		</div>';
-							str+='	</div>';
-							feed_debug++;
-						    //console.log(item.caption);
-						}//end for
-						$( "#preloading" ).remove();
-						$( "#stupid" ).append(str);
-						//add_class_it();
-						loading_new_feed =false;
-						
-				    }).fail(function() {
-				    	
-					    console.log( "error" );
-					});
-		}//end load_json_feed2
-		function search_hashtag(str){
-			var clean ="";
-			var white_arr = str.split(" ");
-			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/show_content_by_hashtag/";
-			for (item of white_arr) {
-				if(item.indexOf('#')>=0){
-					item='<a href="'+base_url+(item.replace("#", ""))+'">'+item+'</a>';
-				}else if(item.indexOf('@')>=0){{
-					item=search_tag_user(item);
-				}}
-				clean+=(item+" ");
-			}
-			return clean;
-		}//end search_hashtag
-		function search_tag_user(str){
-			var kept_str = str.split('@');
-			var not_use=kept_str[0];
-			var res = str.slice(str.indexOf('@'),str.length);
-			res = res.split('@');
-			res=res.slice(1,res.length);
-			var u_str="";
-			for (node of res) {
-				node = '<a href="https://www.instagram.com/'+node+'" target="_blank" >@'+node+'</a>';
-				u_str+=node;
-			}
-			return not_use+u_str;
-		}//end search_tag_user
-
-		start_ul
-		//$('ul.first')
-		$( "#start_ul" ).bsPhotoGallery({//properly
-		//$('ul.first').bsPhotoGallery({//properly
-          "classes" : "col-lg-2 col-md-4 col-sm-3 col-xs-4 col-xxs-12",
-          "hasModal" : true
-        });//end bsPhotoGallery
+		$('img').on('load', function() {
+	    	if(($(this).attr('id').indexOf('hash_img'))>=0){
+		    	if($(this).width()>$(this).height()){
+		    		$(this).addClass( "crop_for_h  " );
+		    	}else{
+		    		$(this).addClass( "crop_for_v " );
+		    	}
+		    	//console.log('resize it');
+		    	if($(this).attr('id')==='hash_img_profile'){
+		    	//	alert('round it');
+		    	//$(this).addClass('img-responsive');
+		    	}
+	    	}
+		});//end load
 		
 	});//end $(document).ready
 	
 	
 </script>
 <style type="text/css">
-	@import url(https://fonts.googleapis.com/css?family=Bree+Serif);
-	.force_back{
-		background-color: black;
-	}
-	.ball-pulse > div {
-	  background: orange;
-	}
-	ul {
-          padding:0 0 0 0;
-          margin:0 0 40px 0;
-      }
-      ul li {
-          list-style:none;
-          margin-bottom:10px;
-      }
-      ul li.bspHasModal {
-          cursor: pointer;
-      }
-      .modal-body {
-          padding:5px !important;
-      }
-      .modal-content {
-          border-radius:0;
-      }
-      .modal-dialog img {
-          text-align:center;
-          margin:0 auto;
-      }
-    .controls{
-        width:50px;
-        display:block;
-        font-size:11px;
-        padding-top:8px;
-        font-weight:bold;
-    }
-    .next {
-        float:right;
-        text-align:right;
-    }
-    .text {
-      font-family: 'Bree Serif';
-      color:#666;
-      font-size:11px;
-      margin-bottom:10px;
-      padding:12px;
-      background:#fff;
-    }
-    .glyphicon-remove-circle:hover {
-      cursor: pointer;
-    }
-    .start{
+		.jonat-thumbnail {
+			float: left;
+		 	position: relative;
+		 	width: 152px;
+			height: 152px;
+			background-color: white;
+			overflow: hidden;
+		  /*margin:10px;*/
+		}
+		.img_size_preview{
+			width: 305px;
+			height:	305px;
+		    margin:10px;
+		}
 
-    }
-    @media screen and (max-width: 380px){
-       .col-xxs-12 {
-         width:100%;
-       }
-       .col-xxs-12 img {
-         width:100%;
-       }
-    }
+		.force_square_image{
+			 border-radius: 50%;
+			 /*padding: 15px;*/
+		}
+		.crop_for_h {
+		  position: absolute;
+		  left: 50%;
+		  top: 50%;
+		  height: 100%;
+		  width: auto;
+		  -webkit-transform: translate(-50%,-50%);
+		      -ms-transform: translate(-50%,-50%);
+		          transform: translate(-50%,-50%);
+		}
+		.crop_for_v {
+		  position: absolute;
+		  left: 50%;
+		  top: 50%;
+		  height: auto;
+		  width: 100%;
+		  -webkit-transform: translate(-50%,-50%);
+		      -ms-transform: translate(-50%,-50%);
+		          transform: translate(-50%,-50%);
+		}
+		.debug_nav{
+			width:100%;
+			height:75px;
+			background-color: white;
+			border-bottom: 1px solid #dbdbdb;
+		}
+		.strech_allpage{
+			width:100%;
+			background-color: #fafafa;
+			height: 300px;
+		}
+		#follow_data ul{
+		    list-style:none;
+		    position:relative;
+		     margin: 0 auto;
+		     display: inline-block;
+		     text-align: center;
+		}
+		#follow_data li{
+		    float: left;
+		    margin:10px;
+		}
 </style>
 <?php
-	// function _add_link_hashtag($raw_str){
-	// 	$raw_arr = explode(' ', $raw_str);
-	// 	$clean_data ="";
-	// 	foreach ($raw_arr as $data) {
-	// 		$pos = strpos( $data, '#');
-	// 		if($pos !== false){
-	// 			$string=$data;
-	// 			$string = str_replace('#', '', $string);
-	// 			$data='<a href ="'.base_url()."index.php/user_activity/show_content_by_hashtag/".$string.'">'.$data.'</a>';
-	// 		}
-	// 		$clean_data.=" ".$data;
-	// 	}
-	// 	 return $clean_data;
-	// }//end _add_link_hashtag
+
 	function _add_link_hashtag($raw_str){
 		$clean_string="";
 		$remove_white = explode(' ', $raw_str);
@@ -292,83 +126,112 @@
 		return $cache_unuse.$_eash_tag;
 	}// end add_a_tag
 ?>
+
+<div id='allpage' class='strech_allpage'>
+		<div class='container'>
+		<div id ='block_for_content' class='row ' style='margin-top:50px;'>
+			<div id='left_edge' class="col-md-1">
+				<!-- left edge -->
+			</div> <!-- end id='left_edge' -->
+			<div id='page_content' class="col-md-10">
+				<!-- 		content start here -->
+				<div id='user_profile_data' class='row'>
+					<div id='block_pro' class='col-md-3'>
+						<div id='user_image_profile' class='  jonat-thumbnail force_square_image'> //..'/a
+							<!-- <img id='hash_img_profile'  src="<?php echo "" ?>"> -->
+							<?php
+								echo "<img id = 'hash_img_profile' src='".base_url()."/uploads/fullsize/".$result['content_data'][0] ['profile_picture']. "'>";
+							?>
+						</div>
+					</div> <!-- end id='block_pro -->
+					<div id ='user_about_profile' class='col-md-9'>
+						<div id='view_user_name'>
+							<h1>
+								<?php echo $result['content_data'][0] ['user_name'] ?>
+							</h1>
+						</div> <!-- end view_user_name -->
+						<div id='view_user_detail'>
+							Satsuki(さっぴょん) 1993.09.24【Japanese,Chinese,English】 Please check Our new instagram @xoxo__ms__ お仕事の依頼はこちら☞sapyon924@gmail.com sapyon924.wix.com/satsuki0924
+						</div> <!-- end view_user_detail -->
+						<div id='follow_data'>
+							<ul>
+								<li>
+									<span>825</span><span>posts</span>
+								</li>
+								<li>
+									<span>3.7m followers</span>
+								</li>
+								<li>
+									<span>114 following</span>
+								</li>
+							</ul>
+						</div> <!-- end id='follow_data' -->
+					</div>
+				</div> <!-- end 'profile_data' -->
+
+				<!-- separate here -->
+
+				<div id='image_data' class = ''>
+					<div id='parent_each'>
+					<div id='image_each' class='row' style='margin-top:40px;'>
+						<?php
+								$count = 0;
+								$user_id =$result['content_data'][0] ['user_id'];
+								// /////////// decare javascript variable
+								echo '<script>var current_user_id = "'.$user_id . '";</script>';//decare variable
+								echo '<script>var current_user_name = "'.$result['content_data'][0] ['user_name'] . '";</script>';//decare variable
+								echo '<script>var feed_debug = "'.$count . '";</script>';//decare variable
+								$max_image=40;
+								$current_image=10;
+								//$count=0;
+								foreach ($result['content_data'] as $data) {
+									//echo "<div  >";
+									echo "<div  class = 'jonat-thumbnail img_size_preview'>";
+									echo $data['file_name'];
+									//echo "<img  id='hash_img".$count."' src='images/".($i%$current_image).".jpg'  >";
+									echo '	<img id="hash_img'.$count.'" src="'.base_url().'/uploads/fullsize/'.$data['file_name'].'">';
+									echo "</div>";
+									$count++;
+									//echo $count;
+								}
+								
+								
+							?>
+					</div> <!-- end id='image_each' -->
+					</div>
+				</div> <!-- end id='image_content' -->
+			</div> <!-- end page_content -->
+			<div id='right_edge' class="col-md-1">
+				<!-- right edge -->
+			</div> <!-- end id='right_edge' -->
+		</div> <!-- end row -->
+	</div> <!-- end container -->
+
+	</div> <!-- end id='allpage' -->
+
+
+
 <div class="container">
-	<div id='stupid'>
+	<div id='astupid'>
 				<?php
-					$count = 0;
-					$user_id =$result['content_data'][0] ['user_id'];
-					// /////////// decare javascript variable
-					echo '<script>var current_user_id = "'.$user_id . '";</script>';//decare variable
-					echo '<script>var current_user_name = "'.$result['content_data'][0] ['user_name'] . '";</script>';//decare variable
-					echo '<script>var feed_debug = "'.$count . '";</script>';//decare variable
-					// ///////////////////////////////
-					echo '<ul id="start_ul" class="row first">';
-					foreach ($result['content_data'] as $data) {
-						echo '<li>';
-						echo '	<img src="'.base_url().'/uploads/fullsize/'.$data['file_name'].'">';
-						echo '	<div class="text" hidden>';
-							$data['caption'] = _add_link_hashtag($data['caption']);
-						echo $data['caption'];
-						echo '	</div>';
-						echo '</li>';
-					}
-					echo '</ul>';
-				?>
-	</div>
-</div>
-<div class='row' id="allcontent3">
-		<div id="display_view3">
-			<div id="content3" class = "col-md-6 col-md-offset-3">
-	
-				<div id='stupid8'> 
-				 <?php
-				// 	echo '<ul class="row first">';
-				// 	foreach ($result['content_data'] as $data) {
-				// 		echo '<li>';
-				// 		echo '	<img src="'.base_url().'/uploads/thumb/'.$data['file_name'].'">';
-				// 		echo '	<div class="text">';
-				// 			$data['caption'] = _add_link_hashtag($data['caption']);
-				// 		echo $data['caption'];
-				// 		echo '	</div>';
-				// 		echo '</li>';
-				// 	}
-				// 	echo '</ul>';
-					//////////////////////////////////////////////////////
-					/////////////////////////////////////////////////////
-					/////////////////////////////////////////////////////
 					// $count = 0;
 					// $user_id =$result['content_data'][0] ['user_id'];
-
-					// /////////// decare javascript variable
+					// // /////////// decare javascript variable
 					// echo '<script>var current_user_id = "'.$user_id . '";</script>';//decare variable
 					// echo '<script>var current_user_name = "'.$result['content_data'][0] ['user_name'] . '";</script>';//decare variable
 					// echo '<script>var feed_debug = "'.$count . '";</script>';//decare variable
-					// ///////////////////////////////
-					// //echo "user id is".$user_id."<br>"."data length ".(count($result['content_data']));
+					// // ///////////////////////////////
+					// echo '<ul id="start_ul" class="row first">';
 					// foreach ($result['content_data'] as $data) {
-					// 	//echo base_url()."index.php/user_activity/show_content_user/";
-					// 	//echo "<br>".$count." post_id ".$data['post_id'];
-					// 	$count++;
-					// 	echo '<script> feed_debug = "'.$count . '";</script>';//decare variable
-					// 	echo '<div class="panel panel-default">';
-					// 	echo '	<div class="panel-body" style="background-color: #AD9999;">';
-					// 	echo ' 		<a href="'.base_url()."index.php/user_activity/show_content_user/".$data['user_id'].'"><p class="lead">'.$data['user_name'].'</p></a>';
-					// 	echo '		<div class="thumbnail">';
-					// 	echo '			<img src="'.base_url().'/uploads/thumb/'.$data['file_name'].'" class="img-responsive">';
-					// 	echo '		</div>';
-					// 	echo '<p>';
-					// 	$data['caption'] = _add_link_hashtag($data['caption']);
-					// 		echo $data['caption'];
-					// 	echo '</p>';
+					// 	echo '<li>';
+					// 	echo '	<img src="'.base_url().'/auploads/fullsize/'.$data['file_name'].'">';
+					// 	echo '	<div class="text" hidden>';
+					// 		$data['caption'] = _add_link_hashtag($data['caption']);
+					// 	echo $data['caption'];
 					// 	echo '	</div>';
-					// 	echo "</div>";
+					// 	echo '</li>';
 					// }
-
+					// echo '</ul>';
 				?>
-				</div>
-			</div>
-
-		</div>
-		
 	</div>
-
+</div>
