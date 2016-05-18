@@ -87,7 +87,7 @@ class User_activity extends CI_Controller{
 	/////////////////////////////////////////////////////////////////////
 	public function flash_debug_upload(){
 		//echo "hello flash";
-		echo "debug++|".$this->input->post('debug_caption')."|++";
+		//echo "debug++|".$this->input->post('debug_caption')."|++";
 
 		$config['upload_path'] = './uploads/fullsize/';
 		$config['allowed_types'] = 'jpg|png';
@@ -253,7 +253,7 @@ class User_activity extends CI_Controller{
 		if(!$this->session->userdata('logged')){
 			$this->load->view('view_user_head');
 			$this->load->view('view_nav_user_bar');
-			$this->load->view("view_login_form");
+			//$this->load->view("view_login_form");
 			//$this->load->view('view_form_upload');
 			$this->load->view('view_user_feed',$data_pack);
 			//$this->load->view("view_logout");
@@ -269,6 +269,28 @@ class User_activity extends CI_Controller{
 	}
 
 //--------------- ## hashtag search ----
+	public function nav_show_content_by_hashta(){
+		$raw_search=$this->input->get_post('search_word');
+		$hashtag = urldecode($raw_search);
+		$data = explode("*",$hashtag);
+		//print_r($data);
+		if($data[0]=='h'){
+			$this->show_content_by_hashtag($data[1]);
+		}else{
+			$req_user_id = $this->db_model->send_user_name_and_get_id($data[1]);
+			if($req_user_id>0){
+				$this->show_content_user($req_user_id);
+			}else{
+				echo "no one";
+			}
+			//echo "result is ".$req_user_id;
+			//
+		}
+		//echo "get|".$hashtag."|";
+		//echo "searching.. ".$hashtag;
+		
+	}
+
 	public function show_content_by_hashtag($hashtag){
 		$hashtag = urldecode($hashtag);
 
@@ -282,10 +304,7 @@ class User_activity extends CI_Controller{
 			);
 			$this->load->view('view_gen_head');
 			$this->load->view('view_nav_user_bar');
-			$this->load->view("view_login_form");
-			//$this->load->view('view_form_upload');
 			$this->load->view('view_tag_feed',$data_pack);
-			//$this->load->view("view_logout");
 			$this->load->view('view_gen_footer');
 
 		}else{//login

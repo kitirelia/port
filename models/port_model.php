@@ -38,7 +38,7 @@
 
 		}
 		function  load_user_feed_more($u_id,$page_res){
-			$max_feed_per_page = 10;
+			$max_feed_per_page = 12;
 			//echo $max_feed_per_page."|".($max_feed_per_page*$page_res);
 			$table_list = array(
 				'content_data.user_id','content_data.caption','content_data.file_name','content_data.create_date','content_data.post_id'
@@ -115,13 +115,29 @@
 			->join('user_data','content_data.user_id=user_data.id','LEFT')
 			->where('content_data.user_id',$uid)
 			->order_by('content_data.create_date','DESC')
-			->limit(10)
+			->limit(12)
 			->get('content_data');
 			$result=$query->result_array();
 
 			return $result;
 
 		}
+		function send_user_name_and_get_id($req_id){
+			//echo "get uid ".$req_id;
+			$query=$this->db
+					->where('user_name',$req_id)
+					->get('user_data');
+			$result=$query->result_array();
+			//echo "<br>--------<br>";
+			
+			if(count($result)>0){
+				//print_r($result);
+				$re_id=$result[0]['id'];
+			}else{
+				$re_id=-1;
+			}
+			return $re_id;
+		}	
 		function fetch_hashtag_content($hashtag){
 			//echo "search of "+$hashtag+"<br>";
 			//$hashtag =trim( preg_replace( "/[^0-9a-z]+/i", "", $hashtag) );	

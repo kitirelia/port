@@ -20,7 +20,7 @@ class Welcome extends CI_Controller {
 					'content_data'=>$feed_data
 					);
 			$this->load->view('view_gen_head');
-			$this->load->view("view_login_form");
+			//$this->load->view("view_login_form");
 			$this->load->view('view_nav_user_bar');
 			$this->load->view('view_new_feed',$data_pack);
 			//$this->load->view("view_logout");

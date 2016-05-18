@@ -44,37 +44,32 @@
 			var getUrl = "http://"+window.location.host+'/port/index.php'+'/user_activity/load_hashtag_more/'+current_hashtag+"/"+current_page;
 			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/";
 			var base_img = "http://"+window.location.host+'/port/index.php'+"/port/../";
-			console.log('req '+getUrl)
+			//console.log('req '+getUrl)
 				  $.getJSON( getUrl)
 				    .done(function( data ) {
 				    	
 				    	if(data.length>0){
 				    		current_page++;
 				    	}
-				    	console.log('get data length '+data.length);
+				    	//console.log('get data length '+data.length);
 				    	var str ='';
 						for (item of data) {
-							//console.log(item);
-							str+= "<div  class = 'jonat-thumbnail'>";
-							str+= "<img id='hash_img"+feed_debug+"' src='"+base_img+"../uploads/thumb/"+item.file_name+"'  >";
+							str+= "<div id='"+item.post_id+"' class = 'jonat-thumbnail'>";
+							str+= "<img  id='hash_img"+item.post_id+"' src='"+base_img+"../uploads/thumb/"+item.file_name+"'   />";
+							str+= "<div id='d_user_name"+item.post_id+"' hidden>";
+							str+= ' 		<a href="'+base_url+"show_content_user/"+item.user_id+'"><p >'+item.user_name+'</p></a>';
 							str+= "</div>";
-							// str+='	<div class = "panel panel-default">';
-							// str+='		<div class="panel-body">';
-							// //console.log(base_url+'show_content_user/'+item.user_id);
-							// str+='		<p>debug '+feed_debug+' post id '+item.post_id+'</p>';
-							// str+='			<a href="'+base_url+'show_content_user/'+item.user_id+'"><p class="lead">'+item.user_name+'</p></a>';
-							// //console.log('			<a href="'+base_url+'show_content_user/'+item.user_id+'><p class="lead">'+item.user_name+'</p></a>');
-							// str+=' 			<div class="thumbnail">';
-							// str+='			<img src="'+base_img +'../uploads/thumb/'+item.file_name+'" class="img-responsive">';
-							// str+='			</div>';
-							// str+='			<p>'+search_hashtag(item.caption)+'</p>';
-							// str+='		</div>';
-							// str+='	</div>';
+							str+= "<div id='d_user_profile"+item.post_id+"' hidden>";
+							str+= "	<img id='profile_img"+item.post_id+"' src='"+base_img+"../uploads/thumb/"+item.profile_picture+"'>";// " $data['profile_picture'];
+							str+= "</div>";
+							//str+= '<div id=caption'+feed_debug+'>'+search_hashtag(item.caption)+'</div>'
+							str+= "<div id='capdata"+item.post_id+"' hidden>"+search_hashtag(item.caption)+"</div>";
+							str+= "</div>";
 							feed_debug++;
-						    //console.log(item.caption);
 						}//end for
 						$( "#preloading" ).remove();
 						$( "#stupid" ).append(str);
+						
 						loading_new_feed =false;
 						
 				    }).fail(function() {
@@ -82,9 +77,19 @@
 					    console.log( "error" );
 					});
 		}//end load_json_feed
+		
 		function search_hashtag(str){
+			//console.log("welcome ------------------");
 			var clean ="";
-			var white_arr = str.split(" ");
+			var white_arr=[];
+			//console.log("before "+str);
+			if(typeof str !== "undefined"){
+				//console.log("ok "+str);
+				white_arr = str.split(" ");
+			}else{
+				//console.log('what the ... '+str);
+			}
+			
 			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/show_content_by_hashtag/";
 			for (item of white_arr) {
 				if(item.indexOf('#')>=0){
@@ -115,13 +120,13 @@
 			var arr = str.split('#');
 			var clean_str="";
 			var count_check=0;
-			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/";
+			var base_url = "http://"+window.location.host+'/port/index.php'+"/user_activity/show_content_by_hashtag/";
 			if(str.indexOf('#')>0){
 				cache_str = arr[0];
 			}
 			for(each_tag of arr){
 				if(each_tag !=cache_str && each_tag.length){
-					console.log("each tag "+each_tag);
+					//console.log("each tag "+each_tag);
 					each_tag = '<a href="'+base_url+each_tag+'">#'+each_tag+'</a>';
 					clean_str+=each_tag;
 				}else if(!each_tag.length && count_check>0){
@@ -132,17 +137,52 @@
 			}
 			return cache_str+clean_str;
 		}//end clean each hash
-
+		
 		$('img').on('load', function() {
-	    	//console.log('image load success width '+$(this).width()+"x "+$(this).height());
-	    	if(($(this).attr('id').indexOf('hash_img'))>=0){
+
+	    	var this_id = $(this).attr('id');
+	    	if(typeof this_id !== typeof undefined && this_id !== false) {
+	    	if((this_id).indexOf('hash_img')>=0 ){
 		    	if($(this).width()>$(this).height()){
 		    		$(this).addClass( "crop_for_h  " );
 		    	}else{
 		    		$(this).addClass( "crop_for_v " );
 		    	}
-		    }
+		    }//end if((this_id).indexOf('hash_img')>=0 ){
+		    }//end if has attr
 		});//end $('img').on('load', function() {
+		
+
+		$('body').on('click','img',
+			function(){
+				var this_id = $(this).attr('id');
+				var parent_id = $(this).parent().attr('id');
+				//console.log('parent_id is  '+parent_id);
+				if(typeof this_id !== typeof undefined && this_id !== false) {
+			    	if((this_id).indexOf('hash_img')>=0 ){
+			    		//
+				   		var lcaption = $('#capdata'+parent_id).html();
+				   		//var thumb_path = $(this).attr('src'); d_user_profile
+				   		var thumb_path =  $('#hash_img'+parent_id).attr('src');
+				   		var content_image = $('#hash_img'+parent_id).attr('src');
+				   		//console.log("content_image "+parent_id,"content_image "+content_image);
+				   		var user_name_tag=$('#d_user_name'+parent_id).html();
+				   		var user_profile_image = $('#d_user_profile'+parent_id+' img').attr('src');
+				   		console.log(user_profile_image);
+				   		var real_path = thumb_path.replace("thumb", "fullsize");
+					  	$('#imagepreview').attr('src',real_path); 
+					  	$('#modal_user_profile').attr('src',user_profile_image);
+					  	$('#modal_user_name').html(user_name_tag);
+					  	$('#caption_me').html(lcaption);
+					 	$('#myModal').modal('show'); // imagemoda
+					}
+				}
+			}
+		);//end $('body').on('click','img',
+		
+		$('#myModal').on('show.bs.modal', function () {
+		     
+		});//end show modal
 	});//end $(document).ready
 	
 	
@@ -203,6 +243,10 @@
 		  -webkit-transform: translate(-50%,-50%);
 		      -ms-transform: translate(-50%,-50%);
 		          transform: translate(-50%,-50%);
+	}
+	.vertical-align {
+		    display: flex;
+		    align-items: center;
 	}
 </style>
 <?php
@@ -275,8 +319,16 @@
 						echo "<div id ='stupid' class ='container'>";
 						//echo "<ul>";
 						foreach ($result['content_data'] as $data) {
-							echo "<div  class = 'jonat-thumbnail'>";
-							echo "<img id='hash_img".$count."' src='".base_url()."/uploads/thumb/".$data['file_name']."'  >";
+							echo "<div id='".$data['post_id']."' class = 'jonat-thumbnail'>";
+							$cap =_add_link_hashtag($data['caption']);
+							echo "<img id='hash_img".$data['post_id']."' src='".base_url()."/uploads/thumb/".$data['file_name']."'   >";
+							echo "<div id='d_user_name".$data['post_id']."' hidden>";
+							echo ' 		<a href="'.base_url()."index.php/user_activity/show_content_user/".$data['user_id'].'"><p >'.$data['user_name'].'</p></a>';
+							echo "</div>";
+							echo "<div id='capdata".$data['post_id']."' hidden>".$cap."</div>";
+							echo "<div id='d_user_profile".$data['post_id']."' hidden>";
+							echo "	<img id='profile_img".$data['post_id']."' src='".base_url()."/uploads/thumb/".$data['profile_picture']."'>";// " $data['profile_picture'];
+							echo "</div>";
 							echo "</div>";
 							$count++;
 						}//end foreach
@@ -292,6 +344,42 @@
 
 		
 	</div>
+
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+    	<div class="modal-content">
+    		<div class="modal-header">
+	        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+	     	</div><!-- end <div class="modal-header"> -->
+      		<div id='modal_body_here' class="modal-body ">
+      			<div class='row'>
+      				<div class="col-md-8 modal_clean_border" >
+      					<img  id="imagepreview" src='http://www.mx7.com/i/ad0/MjAbok.png' class='img-responsive'>
+      				</div>
+  					<div class="col-md-4 modal_clean_border">
+  						<div class='row vertical-align' style=" border-bottom: 1px solid #efefef; padding: 15px;">
+  							<div  class="col-md-4">
+  								<img  id='modal_user_profile'
+  										class='img-responsive img-circle'
+  										src="https://instagram.fbkk9-1.fna.fbcdn.net/t51.2885-19/s150x150/11378177_1602477123409848_72885111_a.jpg">
+  							</div>
+  							<div class="col-md-8" id='modal_user_name' class='modal_text_too_long'></div>
+  						</div>
+  						<div id='caption_me'>
+
+  						</div>
+  					</div>
+      			</div> <!-- end row -->
+      		</div> <!-- end div class="modal-body -->
+      		<div class="modal-footer" hidden>
+		        
+		     </div> <!-- end <div class="modal-footer"> -->
+    </div> <!-- end <div class="modal-content -->
+
+	</div> <!-- end <div class="modal-dialog -->
+</div><!-- end <div id="myModal"  -->
 
 <div class='container'>
 		<div class='row'>

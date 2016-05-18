@@ -8,6 +8,7 @@
 	<?php echo css_asset('bootstrap.min.css'); ?>
 	<?php echo css_asset('loaders.min.css'); ?>
 	<?php echo js_asset('loaders.css.js'); ?>
+	<?php echo js_asset('bootstrap.js'); ?>
 	<style type="text/css">
 		.h3text{
 			text-align: center;
